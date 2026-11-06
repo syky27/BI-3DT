@@ -27,10 +27,13 @@ Start SolidCraft with a clean settings folder on a control port, then run the dr
 export SOLIDCRAFT_CONTROL_TOKEN=$(openssl rand -hex 32)
 SOLIDCRAFT_SETTINGS_DIR=/tmp/sc-settings solidcraft --control 27900 &
 python3 shots.py          # stills -> ../../shots/   (window must be visible on screen)
-python3 clips.py          # mp4 clips -> ../../clips/  (agent cursor + ~4 fps window frames)
+python3 rec2.py           # mp4 clips -> ../../clips2/ (one frame per pointer step/click/key, 10 fps)
 ```
 
-`sc.py` is the one-call control-channel client both drivers use. The paths at the top of
+`sc.py` is the one-call control-channel client both drivers use. `rec2.py` drives the real UI
+(toolbar buttons, dialog fields and dropdowns by their `ui.handles` names, picks by
+`ui.worldToScreen`) and screenshots the window after every step, so nothing is missed; keep the
+SolidCraft window visible while it runs, it re-activates the app when a frame comes back hidden. The paths at the top of
 `shots.py` assume the checkpoints live in `../media/ckpt/<lesson>/`; adjust `CK` when running
 from the repository. Callouts on `window-callouts.png` are drawn with ImageMagick (see the
 `magick` command in the git history of this folder).
