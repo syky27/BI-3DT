@@ -1,0 +1,306 @@
+= SolidCraft 1: Od skici k tělesu
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+.Po této lekci umíte
+* nakreslit skicu na rovině počátku, okótovat ji a plně určit vazbami,
+* udělat z ní těleso operací *Extrude* a zaoblit ho operací *Fillet*,
+* kterýkoli krok později upravit z *časové osy*,
+* *pojmenovat* důležité rozměry (uživatelské parametry) a odvodit z nich další
+  rozměry výrazy,
+* uložit návrh (`.sc`) a exportovat STL pro slicer.
+
+Přineste notebook s xref:install#[nainstalovaným SolidCraftem] a myš. Nejdřív
+si přečtěte xref:ui#[Co je kde].
+
+== Rozvrh (135 min)
+
+[cols="1,1,5",options="header"]
+|===
+|Min |Kdo |Co
+
+|0–10 |cvičící |Kontrola instalace na každém notebooku. Otevření ukázkové
+destičky, otáčení, fit, standardní pohledy, zpět. Kde je nabídka File, panel
+nástrojů, browser a časová osa.
+|10–30 |cvičící |*Skica.* Nová skica na rovině; obdélník, kružnice, úsečka;
+napsané rozměry se stávají kótami; vazby (coincident, horizontal/vertical,
+equal, symmetry); změna barvy modrá → bílá při plném určení; smazání vazby;
+Finish Sketch.
+|30–45 |cvičící |*Operace.* Extrude (new body, join, cut; vzdálenost vs. through
+all), Fillet, Chamfer, Hole. Časová osa: dvojklik upraví, rollback, smazání.
+|45–65 |cvičící |*Parametry.* Napsání `width = 60` do pole hodnoty; dialog
+Parameters; výraz v kótě (`width / 2`), odvozený parametr
+(`hole_inset = hole_d * 2`), funkce (`min(…)`). Změna hodnoty a sledování
+přestavby. Uložení `.sc`, export STL, co obsahuje soubor `.sc`.
+|65–125 |studenti |xref:_uloha_parametricka_montazni_desticka[Úloha: parametrická montážní destička] s checkpointy
+|125–135 |všichni |Ukázky: tři destičky s jinými parametry, co se rozbilo, když
+byl otvor moc velký, kde najít manuál.
+|===
+
+Cvičící modeluje *jiný objekt* než zadání (studenti si na začátku vyberou např.
+stojánek na telefon, háček na stůl, podtácek s vyříznutým logem, klip na
+kabel). Smyslem je vidět každý nástroj z výše uvedeného seznamu použitý jednou
+na něčem, co jste si nevybrali sami.
+
+[[teacher-checklist]]
+.Seznam nástrojů, které má cvičící v této lekci ukázat
+****
+*Navigace:* otáčení, posun, zoom, fit (kbd:[F6]), zepředu/shora/izo
+(kbd:[Ctrl+1], kbd:[Ctrl+5], kbd:[Ctrl+7]), Look At (kbd:[Ctrl+8]).
+*Skica:* New Sketch, Rectangle (kbd:[R]), Circle (kbd:[C]), Line (kbd:[L]),
+Dimension (kbd:[D]), vazby Coincident, Horizontal/Vertical, Equal, Symmetry,
+konstrukční čára (kbd:[X]), Finish Sketch, stav "fully constrained" v paletě.
+*Model:* Extrude (kbd:[E]) s New Body / Join / Cut, Fillet (kbd:[F]), Chamfer,
+Hole (kbd:[H]).
+*Časová osa:* dvojklik upraví, značka rollbacku, pravé tlačítko › Delete,
+rozdíl mezi undo a časovou osou.
+*Parametry:* `jméno = hodnota` v poli hodnoty, dialog Parameters, výraz v kótě,
+odvozený parametr, `min()`.
+*Soubory:* Save (kbd:[Ctrl+S]), File › Export STL, otevření `.sc`.
+****
+
+== 1. Skici
+
+Skica je 2D kresba na rovině. Začnete ji tlačítkem *New Sketch* (kbd:[S],
+napsat `sketch`, nebo první tlačítko záložky Model) a kliknutím na jednu ze
+tří rovin počátku: *XY* (Top) je destička na stole, *XZ* (Front) a *YZ*
+(Right) stojí. Pohled se otočí čelem k rovině.
+
+video::new-sketch.mp4[width=720]
+
+.Kreslení
+Vyberte *Rectangle* (kbd:[R]), klikněte na první roh, napište šířku,
+kbd:[Tab], výšku, kbd:[Enter]. Každé číslo, které napíšete, se stane *kótou*
+v kresbě. *Circle* (kbd:[C]): klik na střed, napsat průměr. *Line* (kbd:[L]):
+klik, klik, …, kbd:[Esc].
+
+video::draw-dimension.mp4[width=720]
+
+.Vazby a kóty
+Skica není obrázek; je to sada *pravidel*, která řešič udržuje v platnosti:
+
+* *Kóty* (kbd:[D]) fixují délku, vzdálenost, průměr, úhel. Klikněte na věc
+  (nebo dvě věci), které měříte, klikněte, kam má jít číslo, napište hodnotu.
+* *Vazby* fixují vztahy bez čísel: dva body *coincident* (totožné), čára
+  *horizontal* nebo *vertical*, dvě kružnice *equal* (stejné), dva body
+  *symmetric* kolem osy, čára *tangent* k oblouku, bod v *midpoint* (středu)
+  čáry. Mnoho se jich přidává automaticky při kreslení (sledujte malé ikony).
+
+Modrá geometrie se ještě může hýbat: chyťte modrý bod myší a potáhne se.
+Přidávejte kóty a vazby, dokud paleta vpravo neřekne *Fully constrained*
+a vše nezbělá. Plně určená skica se mění jen tak, jak jí řeknete, a to je celá
+pointa parametrického modelování.
+
+.Plně určená skica: 2 kóty obdélníku, průměr, 2 vzdálenosti jednoho otvoru, symetrie a rovnost pro zbylé tři
+image::sketch-mode.png[width=800, link=../../../images/solidcraft/sketch-mode.png]
+
+TIP: Přeurčující úpravy program odmítne se zprávou, tiše je neignoruje. Když
+kótu "nelze přidat", ten rozměr už něco fixuje: najděte vazbu a nejdřív ji
+smažte.
+
+*Finish Sketch* (paleta nebo zelená záložka) skicu zavře. Uzavřené oblasti
+skici jsou *profily*, modře vyšrafované; kružnice uvnitř obdélníku udělá
+v profilu obdélníku automaticky díru.
+
+== 2. Operace: vytažení a zaoblení
+
+*Extrude* (kbd:[E]): klikněte na profil, táhněte šipku nebo napište vzdálenost,
+kbd:[Enter]. Dialog zvolí *New Body* pro první těleso; u dalších vytažení
+nabídne *Join* (přidat materiál), *Cut* (odebrat) a *Intersect*. Rozsah může
+být vzdálenost, *symmetric* kolem skici, *through all* nebo *to* (po plochu).
+
+video::extrude.mp4[width=720]
+
+*Fillet* (kbd:[F]): klikejte na hrany (Shift přidává), napište poloměr.
+*Chamfer* je totéž se vzdáleností. *Hole* (kbd:[H]): klikněte na plochu,
+nastavte průměr; otvor lze umístit vzdálenostmi od dvou hran, což je často
+jednodušší než kreslit kružnici ve skice.
+
+.Dialog Fillet se čtyřmi vybranými hranami
+image::fillet-dialog.png[width=800, link=../../../images/solidcraft/fillet-dialog.png]
+
+== 3. Časová osa
+
+Pruh *History* dole vypisuje operace v pořadí, v jakém se počítají: Sketch →
+Extrude → Fillet. To je návrh. Undo (kbd:[Ctrl+Z]) vrací, co jste *udělali*;
+časová osa je to, z čeho se model *skládá*.
+
+* *Dvojklik* na operaci ji upraví: model se vrátí do toho bodu, dialog se
+  otevře vyplněný, změníte hodnotu, kbd:[Enter], a vše za ním se přestaví.
+* Přetažením *značky* na konci dozadu uvidíte návrh, jak byl. Operace za
+  značkou zůstanou. Nová operace se vloží u značky.
+* Pravé tlačítko na operaci: *Suppress* (vypnout bez smazání), *Rename*,
+  *Delete* (zeptá se, když na ní závisí jiné operace).
+
+video::edit-timeline.mp4[width=720]
+
+.Pozdější úprava vytažení: zaoblení se přestaví na tlustší destičce
+image::timeline-edit.png[width=800, link=../../../images/solidcraft/timeline-edit.png]
+
+== 4. Parametry
+
+Zatím je destička 60 × 40 se 4mm otvory 9 mm od hrany a každé z těch čísel
+žije ve vlastní kótě. Změňte šířku a otvory zůstanou, kde byly. To řeší
+*uživatelské parametry*.
+
+.Pojmenování hodnoty při psaní
+Do *kteréhokoli* pole hodnoty (kóta, vzdálenost vytažení, poloměr zaoblení)
+můžete místo `60` napsat `width = 60`. SolidCraft vytvoří uživatelský parametr
+`width` s hodnotou 60 a kóta od té chvíle říká `width`. Dvojklik na kótu pak
+ukáže `width` a napsání `width = 80` tamtéž parametr změní.
+
+video::name-parameter.mp4[width=720]
+
+.Dialog Parameters
+*Model › Configure › Parameters* (nebo kbd:[S], `param`) vypisuje vše:
+
+* *User parameters* — ty, které jste pojmenovali, s jednotkou, výrazem,
+  spočtenou hodnotou a komentářem. *Add parameter* udělá nový.
+* *Model parameters* — každá kóta a každý vstup operace, pojmenované `d1`,
+  `d2`…, seskupené podle skici nebo operace. Jejich výraz může být číslo nebo
+  cokoli s uživatelskými parametry.
+
+.Šest uživatelských parametrů destičky. Dva jsou odvozené z ostatních.
+image::parameters-dialog.png[width=800, link=../../../images/solidcraft/parameters-dialog.png]
+
+.Výrazy
+Výraz parametru, hodnota kóty i vstup operace mohou být *výrazy*:
+
+[cols="2,3",options="header"]
+|===
+|Výraz |Význam
+
+|`width / 2` |polovina šířky
+|`hole_d * 2` |střed otvoru je dva průměry od hrany
+|`min(thickness, hole_inset / 2)` |poloměr rohu, nikdy větší než polovina odsazení
+|`2 * wall + 5 mm` |jednotky jsou dovolené a kontrolované: délka plus úhel je chyba
+|`floor((width - 10) / 8)` |počet: kolik 8mm drážek se vejde
+|`1 in + 3 mm` |28,4 mm; `1/2 in` je půl palce
+|===
+
+K dispozici: `+ - * / ^ %`, závorky, `sin cos tan asin acos atan atan2 sqrt abs
+sign min max floor ceil round trunc mod exp ln log log10 pow hypot`, jednotky
+`mm cm m in ft deg rad`. Cyklus (`a` používá `b` používá `a`) se nahlásí
+i s cestou. Přejmenování parametru aktualizuje každý výraz, který ho používá;
+používaný parametr nelze smazat.
+
+.Změna parametru
+Upravte výraz v dialogu a stiskněte kbd:[Enter]: časová osa se přestaví od
+první operace, která ho používá. To je chvíle, kdy hledáte, co jste
+k parametrům *nepřivázali*.
+
+.`width = 100`: otvory šly s hranami, zaoblení s rohy
+image::parameters-width-100.png[width=800, link=../../../images/solidcraft/parameters-width-100.png]
+
+TIP: Komentujte každý parametr (poslední sloupec). Za tři týdny si nebudete
+pamatovat, jestli se `inset` měřil od hrany nebo od středu.
+
+== 5. Ukládání a export
+
+* kbd:[Ctrl+S] uloží návrh jako `jmeno.sc`. To je soubor, který odevzdáváte
+  a ze kterého pokračujete příští týden.
+* *File › Export STL…* zapíše síť pro slicer. U dílů s křivkami zvolte kvalitu
+  *fine*. *File › Export 3MF…* udrží více těles jako samostatné díly.
+* Soubor `.sc` je ZIP s návrhem v JSONu. Podrobnosti v
+  xref:ui#files[Co je kde › Soubory].
+
+[[_uloha_parametricka_montazni_desticka]]
+== Úloha: parametrická montážní destička
+
+Vymodelujte destičku ze snímků výše: obdélníková destička se čtyřmi montážními
+otvory a zaoblenými rohy, celá řízená parametry. Pak ukažte, že přežije změnu
+každého parametru.
+
+.Checkpointy
+Ke každému kroku je ke stažení soubor `.sc`, který můžete otevřít pro
+porovnání se svým, nebo z něj pokračovat, když se zaseknete:
+
+[cols="1,3,2",options="header"]
+|===
+|Krok |Co obsahuje |Soubor
+
+|1 |skica: obdélník 60 × 40 se středem v počátku, čtyři otvory Ø 4,5 9 mm od
+hran, plně určená vazbami symmetry a equal
+|link:../../../stls/solidcraft/plate-01-sketch.sc[plate-01-sketch.sc]
+
+|2 |vytaženo 4 mm, těleso pojmenované *Plate* |link:../../../stls/solidcraft/plate-02-extruded.sc[plate-02-extruded.sc]
+|3 |rohy zaoblené r = 4 |link:../../../stls/solidcraft/plate-03-fillets.sc[plate-03-fillets.sc]
+|4 |šest uživatelských parametrů, každá kóta a vstup operace jimi řízený
+|link:../../../stls/solidcraft/plate-04-parametric.sc[plate-04-parametric.sc]
+|— |exportovaná síť |link:../../../stls/solidcraft/plate.stl[plate.stl]
+|===
+
+image::plate-02-extruded.png[width=300] image::plate-03-fillets.png[width=300] image::plate-05-variant.png[width=300]
+
+=== Krok 1: skica (15 min)
+
+. *New design* (milimetry). *New Sketch* na rovině *XY*.
+. *Rectangle › Center Rectangle*: klik na počátek, napsat `60`, kbd:[Tab],
+  `40`, kbd:[Enter]. Pokud jste místo toho použili 2-point rectangle, přidejte
+  vazbu *Symmetry* dvou protilehlých rohů kolem osy X skici a další kolem Y,
+  aby počátek zůstal uprostřed.
+. *Circle* (kbd:[C]) poblíž pravého horního rohu, průměr `4.5`.
+. *Dimension* (kbd:[D]): klik na střed kružnice, pak na pravou stranu
+  obdélníku, umístit číslo, napsat `9`. Totéž s horní stranou.
+. Tři další kružnice poblíž ostatních rohů (libovolná velikost, kdekoli
+  poblíž).
+. *Equal*: vyberte všechny čtyři kružnice, klikněte na Equal. *Symmetry*:
+  levý horní a pravý horní střed kolem svislé osy, pak horní a dolní dvojice
+  kolem vodorovné osy (osy skici se počítají jako osy zrcadlení).
+. Paleta říká *Fully constrained*. Pokud ne, potáhněte modrý bod, abyste
+  viděli, co je volné, a přidejte chybějící pravidlo. *Finish Sketch*.
+
+=== Krok 2 a 3: vytažení a zaoblení (10 min)
+
+. *Extrude* (kbd:[E]), klik na profil (obdélník bez otvorů je jeden profil),
+  vzdálenost `4`, kbd:[Enter].
+. *Fillet* (kbd:[F]), klik na čtyři svislé rohové hrany, poloměr `4`,
+  kbd:[Enter].
+. Pravé tlačítko na vytažení v časové ose, *Rename* na `Plate`. Uložit jako
+  `plate.sc`.
+
+=== Krok 4: parametrizace (25 min)
+
+. Otevřete *Parameters*. Přidejte, s komentáři:
++
+[cols="1,1,2",options="header"]
+|===
+|Jméno |Výraz |Komentář
+|`width` |`60` |rozměr destičky podél X
+|`length` |`40` |rozměr destičky podél Y
+|`thickness` |`4` |
+|`hole_d` |`4.5` |průchozí otvor pro M4
+|`hole_inset` |`hole_d * 2` |střed otvoru od hran
+|`corner_r` |`min(thickness, hole_inset / 2)` |nikdy víc než polovina odsazení
+|===
+. Stále v dialogu otevřete *Model parameters* a nahraďte kóty skici: `60` →
+  `width`, `40` → `length`, `4.5` → `hole_d`, obě `9` → `hole_inset`. (Nebo
+  upravte skicu a dvojklikem každou kótu.)
+. Dvojklik na *Plate* v časové ose, vzdálenost `thickness`. Dvojklik na
+  zaoblení, poloměr `corner_r`.
+. Test: nastavte `width` na `100`, `length` na `30`, `thickness` na `6`,
+  `hole_d` na `3.2`. Otvory musí zůstat dva průměry od hran a rohy musí být
+  stále kulaté. Pak nastavte `hole_d` na `12` a vysvětlete, co se stane
+  s `corner_r`.
+. Uložte. *File › Export STL*.
+
+=== Odevzdání
+
+Vaše `plate.sc` s vlastními hodnotami parametrů (ne 60 × 40) a věta ve
+sloupci komentáře u každého parametru.
+
+== Časté problémy
+
+* *"Skica je modrá a nevidím proč."* Potáhněte modrou část. Co se hýbe, není
+  určené. Typicky: střed kružnice umístěný u rohu, ale neokótovaný.
+* *Extrude udělá dvě tělesa.* Kružnice nebyly uvnitř obdélníku nebo obrys
+  protíná čára. Před dokončením zkontrolujte šrafování profilu.
+* *Fillet odmítnut ("larger than the neighbouring faces").* Poloměr je větší
+  než geometrie kolem hrany, třeba roh mezi dvěma otvory. Přesně proto
+  `corner_r` používá `min()`.
+* *Otvor se posunul, když jsem změnil šířku.* Nějaká kóta pořád drží číslo
+  místo `hole_inset`. Podívejte se na *Model parameters* v dialogu.
+* *Změnil jsem `width` a nic se nestalo.* Upravili jste sloupec *hodnoty*
+  u modelového parametru, který je řízený výrazem; upravte uživatelský
+  parametr.

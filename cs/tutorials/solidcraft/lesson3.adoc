@@ -1,0 +1,343 @@
+= SolidCraft 3: Návrh, který snese změnu
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+.Po této lekci umíte
+* uspořádat parametry tak, aby někdo jiný (nebo vy za měsíc) mohl návrh
+  bezpečně měnit,
+* držet v jedné tabulce více *konfigurací* (velikostí, variant) jednoho návrhu
+  a přepínat mezi nimi,
+* najít hodnoty parametrů, při kterých se návrh *rozbije*, pomocí
+  *parametrického sweepu* dřív, než to někdo vytiskne,
+* exportovat správný soubor pro tisk a vědět, co u STL znamená *kvalita*,
+* přestavět, vykreslit a změřit návrh z *příkazové řádky* a převést návrh na
+  *skript*.
+
+Tato lekce je můstek k parametrickému úkolu v OpenSCADu: stejné uvažování
+(rozhraní = parametry, vše ostatní odvozené, test na krajích) v klikacím
+nástroji.
+
+== Rozvrh (135 min)
+
+[cols="1,1,5",options="header"]
+|===
+|Min |Kdo |Co
+
+|0–10 |cvičící |Dvě krabičky z úkolu vedle sebe; co šlo těžko měnit a proč.
+|10–25 |cvičící |*Hygiena parametrů.* Oblíbené, komentáře, seskupení prefixem,
+Param Graph, přejmenování (odkazy následují), pravidlo "jedno rozhodnutí,
+jeden parametr", textové parametry pro gravírované popisky, CSV import/export
+parametrů.
+|25–45 |cvičící |*Konfigurace.* Configure sloupce, přidání řádků S/M/L,
+Activate, Preview, pravidlo ("velké díly mají tlustší stěnu"), potlačení
+operace v řádku (varianta bez průduchů).
+|45–60 |cvičící |*Kontrola.* Parameter Sweep přes rozsah; čtení zprávy; oprava
+návrhu, aby se celý rozsah postavil. Interference a Mass Center.
+|60–75 |cvičící |*Ven z programu.* Export STL/3MF/STEP a co dělá kvalita;
+tělesa vs. komponenty (pět minut New Component a kloub); `solidcraft-cli run`,
+`snapshot`, `eval`, `script`; MCP server v jedné větě.
+|75–125 |studenti |xref:_uloha_parametricky_hreben_na_kabely[Úloha: parametrický hřeben na kabely ve třech velikostech]
+|125–135 |všichni |Každá dvojice ukáže svou zprávu ze sweepu a jednu hodnotu,
+která návrh rozbila.
+|===
+
+Objekt cvičícího opět dodají studenti (držák cívky, přepážka do šuplíku, dok
+na konkrétní telefon, jmenovka s textovým parametrem…).
+
+.Seznam nástrojů, které má cvičící v této lekci ukázat
+****
+*Manage › Parameters:* oblíbené, komentáře, přejmenování, smazání (odmítnuto,
+dokud se používá), Param Graph, Export/Import CSV, parametr `text` řídící
+*Sketch Text*.
+*Manage › Configurations:* Configure (sloupce), Config Table, řádky, Activate,
+Preview Row, Add rule, sloupec *feature suppression*.
+*Inspect:* Parameter Sweep (příkaz `inspect.parameter_sweep`: kbd:[S],
+`sweep`), Mass Center, Interference, Measure.
+*Assemble:* New Component, Create Components from Bodies, Joint (revolute),
+pohon kloubu. Jen jako výhled.
+*File:* Export STL s kvalitou, 3MF s tělesy jako díly, STEP, Save As JSON.
+*CLI:* `solidcraft-cli run`, `--save`, `--out`, `eval`, `snapshot`, `script`.
+****
+
+== 1. Hygiena parametrů
+
+Návrh s dvanácti parametry je užitečný, jen když cizí člověk pozná, které tři
+má měnit. V dialogu Parameters:
+
+* *Oblíbené* (hvězdička) označte parametry, které jsou *rozhraním* návrhu:
+  `comb_w`, `cable_d`. Řadí se nahoru.
+* *Komentujte* každý parametr: co to je, kterým směrem, co ho omezuje.
+* *Prefixujte* související parametry: `vent_w`, `vent_pitch`, `vent_count`.
+* Odvozené hodnoty jsou výrazy, nikdy napsaná čísla: `pitch = cable_d + wall`.
+* *Přejmenovávejte* volně; každý výraz, kóta a operace, které parametr
+  používají, následují. *Smazání* je odmítnuto, dokud parametr něco používá,
+  a hláška vypíše uživatele.
+* *Manage › Param Graph* nakreslí závislosti. Modelový parametr s číslem a bez
+  příchozí šipky je rozměr, který jste zapomněli přivázat.
+* *Export CSV* dá tabulku, kterou můžete držet vedle návrhu (nebo ji vrátit
+  přes *Import*).
+
+Parametr typu *text* (jednotka `text`) může řídit *Sketch Text*: jeden návrh,
+gravírovaný jménem každého studenta.
+
+== 2. Konfigurace
+
+*Konfigurace* je pojmenovaný řádek hodnot parametrů (a volitelně: které
+operace jsou potlačené, jaký materiál nebo vzhled má které těleso). *Model ›
+Configure › Config Table* tabulku otevře.
+
+. *Configure* (rozbalovací nabídka vedle tlačítka) volí *sloupce*: které
+  parametry a které operace řádky řídí. První řádek *Default* převezme
+  aktuální hodnoty.
+. *Add configuration* přidá řádek; napište hodnoty. Řádky lze kopírovat
+  z jiného řádku.
+. *Activate* řádek: návrh se přestaví s těmito hodnotami. *Preview Row*
+  přestaví pracovní kopii a vypíše efektivní hodnoty a uplatněná pravidla,
+  aniž by se dotkl návrhu.
+. *Pravidla* (pod tabulkou) běží po řadě: "když `comb_w` ≥ 80 mm, nastav
+  `wall` na `comb_w / 40`", "`cable_d` musí být mezi 2 a 12 mm". Pravidlo může
+  také *omezit* hodnotu na rozsah nebo seznam.
+
+video::config-activate.mp4[width=720]
+
+.Tabulka konfigurací hřebene s řádky S, M a L
+image::config-table.png[width=800, link=../../../images/solidcraft/config-table.png]
+
+image::config-S.png[width=440, link=../../../images/solidcraft/config-S.png] image::config-L.png[width=440, link=../../../images/solidcraft/config-L.png]
+
+Sloupec *feature suppression* vypne operaci v některých řádcích: varianta bez
+průduchů, bez loga, bez zkosení pro zkušební tisk.
+
+Konfigurace se ukládají do souboru `.sc`. Při exportu STL dostanete *aktivní*
+řádek, takže exportujte jednou na řádek a soubory podle toho pojmenujte.
+
+== 3. Kontrola návrhu přes rozsah
+
+Parametrický návrh je slib: "každá šířka mezi 40 a 150 mm se postaví".
+*Parameter Sweep* drží slib poctivý. Přestaví *kopii* návrhu v každé z hodnot
+parametru a nahlásí operace, které selžou nebo varují, skici, jejichž řešení
+se překlopí, a klouby, které se rozpadnou. Samotný návrh zůstane nedotčený.
+
+Spusťte ho z hledání příkazů (kbd:[S], `sweep`) nebo jako příkaz ve skriptu:
+
+[source,json]
+----
+{"command": "inspect.parameter_sweep",
+ "params": {"parameter": "comb_w", "from": 10, "to": 150, "steps": 14}}
+----
+
+Zpráva pro checkpoint hřebene (link:../../../stls/solidcraft/comb-sweep-result.json[celý JSON]):
+
+[cols="1,1,4",options="header"]
+|===
+|`comb_w` |ok |co selhalo
+|10, 30, 40, 60, 70, 80, 100, 110, 130, 140, 150 |ano |
+|20, 50, 90, 120 |*ne* |`Corners`: "the blend is larger than the neighbouring faces; the largest radius that fits is 0.5 mm"
+|===
+
+Čtyři hodnoty z patnácti rozbijí zaoblení: při těch šířkách přistane pole
+drážek tak blízko konce, že 2mm zaoblení rohu nemá na čem sedět. Oprava je
+návrhářské rozhodnutí, ne klik: buď zaručit koncovou stěnu
+(`slot_count = floor((comb_w - 2 * end_wall) / pitch)`), nebo nechat poloměr
+zaoblení záviset na skutečné koncové stěně přes `min()`, nebo říct sweepu, že
+20 mm je mimo slíbený rozsah. Zkuste všechny tři; sweep vám řekne, kdy jste
+hotovi.
+
+.Selhávající zaoblení při `comb_w = 20`, otevřené z časové osy
+image::feature-error-dialog.png[width=800, link=../../../images/solidcraft/feature-error-dialog.png]
+
+Další kontroly v *Inspect*: *Interference* mezi tělesy (narazí víko do
+krabičky?), *Mass Center* (převrátí se?), *Properties* pro objem, ze kterého
+slicer odhaduje spotřebu filamentu.
+
+== 4. Dostat díl ven
+
+* *STL* je jedna síť na export; *kvalita* standard / fine / finest určuje, jak
+  těsně trojúhelníky sledují zakřivené plochy (tolerance tětivy 2·10⁻⁴, 5·10⁻⁵
+  nebo 10⁻⁵ velikosti tělesa). Fine je správně pro cokoli kulatého, co musí
+  lícovat.
+* *3MF* udrží více těles jako samostatné objekty (nebo s *bodies as parts* jako
+  jeden objekt s díly) a nese barvy. U vícetělesových návrhů ho preferujte;
+  OrcaSlicer ho čte přímo.
+* *STEP* je přesná geometrie pro jiné CAD programy a pro archiv; to dáváte
+  strojní dílně.
+* *Send to Slicer* otevře export rovnou ve sliceru registrovaném pro soubory
+  3MF.
+* *Save As JSON* zapíše návrh jako čitelný JSON; `git diff` nad ním ukáže
+  přesně, který parametr se mezi dvěma commity změnil.
+
+Pro tiskovou část předmětu platí: `.sc` v repozitáři, STL nebo 3MF pro slicer,
+nikdy naopak.
+
+== 5. Tělesa, komponenty a klouby (výhled)
+
+Vše dosud žilo v *tělesech*. Když jsou díly samostatné kusy, které se hýbou
+nebo opakují, SolidCraft jim říká *komponenty*: *Assemble › New Component*
+nebo *Create Components from Bodies* na existujícím návrhu. Komponenty mají
+vlastní počátek, lze je umístit vícekrát a *klouby* (rigid, revolute, slider,
+cylindrical, ball…) je spojují, takže můžete *pohánět* pant nebo šoupátko
+a kontrolovat, že nic nekoliduje (*Inspect › Interference*, *contact sets*).
+Importované sestavy STEP si zachovají strom komponent.
+
+Tento předmět sestavy nehodnotí; pokud je vaše semestrálka mechanismus,
+pokračujte v https://docs.solidcraft.io/guide/assemblies.html[kapitole
+o sestavách v manuálu].
+
+== 6. Příkazová řádka a skripty
+
+`solidcraft-cli` je tentýž program bez okna. Tři příkazy pokryjí většinu
+použití:
+
+[source,sh]
+----
+# přestavět návrh a exportovat; selhávající operace běh zastaví
+solidcraft-cli run --in comb-04-configs.sc --out comb.stl --quality fine
+
+# změřit: objem, plocha, těžiště, počty ploch/hran jako JSON
+solidcraft-cli eval comb-04-configs.sc
+
+# obrázek z izometrického pohledu bez mřížky
+solidcraft-cli snapshot comb-04-configs.sc --out comb.png --no-grid
+----
+
+*Skript* je JSON seznam týchž příkazů, které spouští panel nástrojů. Tenhle je
+první checkpoint hřebene:
+
+[source,json]
+----
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "comb_w", "expression": "80", "unit": "mm"}},
+  {"command": "parameters.add", "params": {"name": "comb_d", "expression": "20", "unit": "mm"}},
+  {"command": "parameters.add", "params": {"name": "comb_h", "expression": "15", "unit": "mm"}},
+  {"command": "sketch.create", "params": {"plane": "XY", "name": "Base outline"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, 0], "corner": ["comb_w / 2", "comb_d / 2"]}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"distance": "comb_h", "name": "Base", "body_name": "Comb"}}
+]}
+----
+
+[source,sh]
+----
+solidcraft-cli run 01-base.json --save comb-01-base.sc        # postavit a uložit
+solidcraft-cli run 02-slot.json --in comb-01-base.sc --save comb-02-slot.sc   # pokračovat z checkpointu
+solidcraft-cli script comb-04-configs.sc --out rebuild.json    # opačný směr: návrh → skript
+solidcraft-cli commands                                        # každý příkaz s parametry
+----
+
+Každý checkpoint na těchto stránkách vznikl přesně takhle; skripty jsou ve
+složce `tools/solidcraft-media/scripts/` repozitáře předmětu. Takhle se také
+*návrh stává reprodukovatelným*: skript v Gitu, `.sc` a STL postavené z něj
+v CI.
+
+Tytéž příkazy posílá AI agent, když `solidcraft-cli mcp` běží jako MCP server,
+a tytéž přijímá `solidcraft --control PORT` přes lokální socket. Pro předmět
+nepotřebné; dobré vědět, až budete chtít vygenerovat sto jmenovek.
+
+[[_uloha_parametricky_hreben_na_kabely]]
+== Úloha: parametrický hřeben na kabely ve třech velikostech
+
+Hřeben na kabely na stůl: kvádr s drážkami s kulatým dnem, jedna na kabel.
+Počet drážek se *počítá* ze šířky a průměru kabelu. Tři konfigurace S, M, L.
+Zpráva ze sweepu, která dokazuje, že se slíbený rozsah postaví.
+
+.Checkpointy
+[cols="1,3,2",options="header"]
+|===
+|Krok |Co obsahuje |Soubor
+
+|1 |osm parametrů (dva oblíbené: `comb_w`, `cable_d`; `pitch` a `slot_count`
+odvozené); základní kvádr *Comb*
+|link:../../../stls/solidcraft/comb-01-base.sc[comb-01-base.sc]
+
+|2 |jedna drážka: obdélník na XZ se zaoblením skici `cable_d / 2` v dolních
+rozích, vytažený symetricky skrz vše jako Cut
+|link:../../../stls/solidcraft/comb-02-slot.sc[comb-02-slot.sc]
+
+|3 |obdélníkové pole s počtem `slot_count`, roztečí `pitch`, vystředěné;
+zaoblení rohů `wall`
+|link:../../../stls/solidcraft/comb-03-pattern.sc[comb-03-pattern.sc]
+
+|4 |tabulka konfigurací s řádky S (50 / 4), M (80 / 5), L (120 / 8)
+|link:../../../stls/solidcraft/comb-04-configs.sc[comb-04-configs.sc]
+
+|— |exporty tří řádků a zpráva ze sweepu
+|link:../../../stls/solidcraft/comb-S.stl[comb-S.stl],
+link:../../../stls/solidcraft/comb-M.stl[comb-M.stl],
+link:../../../stls/solidcraft/comb-L.stl[comb-L.stl],
+link:../../../stls/solidcraft/comb-M.3mf[comb-M.3mf],
+link:../../../stls/solidcraft/comb-M.step[comb-M.step],
+link:../../../stls/solidcraft/comb-sweep-result.json[comb-sweep-result.json]
+|===
+
+image::comb-02-slot.png[width=300] image::comb-03-pattern.png[width=300] image::comb-04-configs.png[width=300]
+
+=== Krok 1: nejdřív parametry (10 min)
+
+Před jakoukoli skicou otevřete *Parameters* a přidejte:
+
+[cols="1,1,2",options="header"]
+|===
+|Jméno |Výraz |Komentář
+|`comb_w` ★ |`80` |celková šířka (X)
+|`comb_d` |`20` |hloubka (Y)
+|`comb_h` |`15` |výška (Z)
+|`cable_d` ★ |`5` |průměr kabelu, který drážka pojme
+|`wall` |`2` |tloušťka zubu mezi drážkami
+|`base_t` |`3` |plné dno pod drážkami
+|`pitch` |`cable_d + wall` |rozteč drážek
+|`slot_count` |`floor((comb_w - wall) / pitch)` |počítané, jednotka *none*
+|===
+
+Pak středový obdélník na XY s polovinami stran `comb_w / 2`, `comb_d / 2`,
+vytažený `comb_h`; těleso *Comb*.
+
+=== Krok 2 a 3: drážka a její pole (15 min)
+
+. Skica na *XZ*. Středový obdélník: střed `[0, -(comb_h + cable_d + base_t) / 2]`,
+  roh `[cable_d / 2, -(comb_h + cable_d)]` (schválně vyčnívá nahoru).
+  *Sketch Fillet* na dva dolní rohy, poloměr `cable_d / 2`: kulaté dno. Finish.
+. Extrude: *Symmetric*, *Through All*, *Cut*. Přejmenujte na `Slot`.
+. *Rectangular Pattern* operace `Slot`: směr X, počet `slot_count`, rozteč
+  `pitch`, zarovnání *center*.
+. *Fillet* čtyř svislých hran, poloměr `wall`.
+. Změňte `cable_d` na 8 a na 3. Spočítejte drážky.
+
+=== Krok 4: tři velikosti (10 min)
+
+. *Configure*: sloupce `comb_w` a `cable_d`.
+. *Config Table*: řádky `S` = 50 / 4, `M` = 80 / 5, `L` = 120 / 8. Každý
+  aktivujte a podívejte se.
+. Přidejte pravidlo: když `comb_w` ≥ 100 mm, nastav `wall` na `3`.
+. Exportujte STL na každý řádek, pojmenované `comb-S.stl` atd., kvalita *fine*.
+
+=== Krok 5: dokažte to (15 min)
+
+. Spusťte sweep přes `comb_w` od 10 do 150 ve 14 krocích a přes `cable_d`
+  s hodnotami 1, 2, 3, 5, 8, 10, 12, 20.
+. Přečtěte zprávu. U každé selhávající hodnoty rozhodněte: opravit návrh,
+  nebo zdokumentovat mez jako pravidlo v tabulce konfigurací (omezení
+  *rozsahu*).
+. Opakujte, dokud není sweep přes slíbený rozsah čistý.
+. Z terminálu: `solidcraft-cli eval comb.sc` a poznamenejte objem řádku M;
+  `solidcraft-cli snapshot comb.sc --out comb.png`.
+
+=== Odevzdání
+
+`comb.sc` se třemi řádky, tři STL, `comb.png` a zpráva ze sweepu
+(`--json-out sweep.json`) finálního návrhu bez selhání ve slíbeném rozsahu.
+Slíbený rozsah napište do komentářů `comb_w` a `cable_d`.
+
+== Časté problémy
+
+* *`slot_count` je 0 nebo záporný při malých šířkách.* Ohlídejte:
+  `max(1, floor(…))` a nechte sweep potvrdit.
+* *Zaoblení selže jen při některých šířkách.* Drážka přistála na rohu.
+  Vyhraďte v počtu koncovou stěnu nebo omezte poloměr přes `min()`; viz
+  oddíl 3.
+* *Řádek S exportuje geometrii M.* Export bere *aktivní* řádek. Aktivujte,
+  pak exportujte.
+* *Pravidlo nic nedělá.* Pravidla běží při *Activate* a *Preview*, ne při každé
+  úpravě parametru; a řízený sloupec musí v tabulce existovat.
+* *`solidcraft-cli` nenalezen.* V linuxových balíčcích je to `solidcraft-cli`,
+  u Snapu `solidcraft.cli`, na macOS je to samostatný zip na stránce vydání.

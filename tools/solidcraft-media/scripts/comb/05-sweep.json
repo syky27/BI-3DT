@@ -1,0 +1,4 @@
+{"commands": [
+  {"command": "inspect.parameter_sweep", "params": {"parameter": "comb_w", "from": 10, "to": 150, "steps": 14}},
+  {"command": "inspect.parameter_sweep", "params": {"parameter": "cable_d", "values": [1, 2, 3, 5, 8, 10, 12, 20]}}
+]}

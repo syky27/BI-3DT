@@ -1,0 +1,3 @@
+{"commands": [
+  {"command": "solid.shell", "params": {"faces": [[0, 0, 30]], "thickness": "wall", "name": "Hollow"}}
+]}

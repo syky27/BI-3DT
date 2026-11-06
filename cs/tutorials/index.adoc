@@ -15,7 +15,8 @@ xref:reprap#[RepRap], xref:git#[Git], xref:openscad#[OpenSCAD: Lehký úvod]
 |3. |02.03.2026 |xref:openscad#[OpenSCAD: Pokročilé]
 |https://github.com/3DprintFIT/B252A-OpenSCAD2-Assignment[3]
 
-|4. |09.03.2026 |xref:fusion#[Fusion 360] – 🖱️  s sebou
+|4. |09.03.2026 |xref:solidcraft#[SolidCraft 1: Od skici k tělesu] – 🖱️  s sebou
+(xref:solidcraft/lesson2#[lekce 2] a xref:solidcraft/lesson3#[lekce 3] následují v dalších týdnech; viz xref:solidcraft#[stránku SolidCraft])
 |3
 
 |5. |16.03.2026 |xref:mesh#[Mesh] – 🖱️  s sebou

@@ -1,0 +1,311 @@
+= SolidCraft 1: From sketch to solid
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+.After this lesson you can
+* draw a sketch on an origin plane, dimension it and constrain it fully,
+* turn it into a solid with *Extrude*, round it with *Fillet*,
+* edit any step later from the *timeline*,
+* give the important sizes *names* (user parameters) and derive other sizes
+  from them with expressions,
+* save a design (`.sc`) and export an STL for the slicer.
+
+Bring a laptop with xref:install#[SolidCraft installed] and a mouse. Read
+xref:ui#[What is where] first.
+
+== Timetable (135 min)
+
+[cols="1,1,5",options="header"]
+|===
+|Min |Who |What
+
+|0–10 |teacher |Install check on every laptop. Open the sample plate, orbit, fit,
+standard views, undo. Where the File menu, the toolbar, the browser and the
+timeline are.
+|10–30 |teacher |*Sketch.* New sketch on a plane; rectangle, circle, line; typed
+sizes become dimensions; constraints (coincident, horizontal/vertical, equal,
+symmetry); the blue → white colour change when fully constrained; deleting a
+constraint; Finish Sketch.
+|30–45 |teacher |*Features.* Extrude (new body, join, cut; distance vs. through
+all), Fillet, Chamfer, Hole. The timeline: double-click to edit, rollback, delete.
+|45–65 |teacher |*Parameters.* Typing `width = 60` in a value box; the Parameters
+dialog; an expression in a dimension (`width / 2`), a derived parameter
+(`hole_inset = hole_d * 2`), a function (`min(…)`). Changing a value and
+watching the rebuild. Save `.sc`, export STL, what a `.sc` file contains.
+|65–125 |students |xref:_task_parametric_mounting_plate[Task: parametric mounting plate] with checkpoints
+|125–135 |all |Show-and-tell: three plates with different parameters, what broke
+when a hole got too big, where to find the Czech/English manual.
+|===
+
+The teacher models a *different object* than the task (students choose at the
+start from e.g. a phone stand, a desk hook, a coaster with a logo cut-out, a
+cable clip). The point is to see every tool from the list above used once, on
+something you did not pick yourself.
+
+[[teacher-checklist]]
+.Teacher's checklist of tools to show in this lesson
+****
+*Navigation:* orbit, pan, zoom, fit (kbd:[F6]), front/top/iso (kbd:[Ctrl+1],
+kbd:[Ctrl+5], kbd:[Ctrl+7]), Look At (kbd:[Ctrl+8]).
+*Sketch:* New Sketch, Rectangle (kbd:[R]), Circle (kbd:[C]), Line (kbd:[L]),
+Dimension (kbd:[D]), constraints Coincident, Horizontal/Vertical, Equal,
+Symmetry, construction line (kbd:[X]), Finish Sketch, the palette's
+"fully constrained" state.
+*Model:* Extrude (kbd:[E]) with New Body / Join / Cut, Fillet (kbd:[F]), Chamfer,
+Hole (kbd:[H]).
+*Timeline:* double-click to edit, rollback marker, right-click › Delete,
+undo vs. timeline.
+*Parameters:* `name = value` in a value box, Parameters dialog, expression in a
+dimension, derived parameter, `min()`.
+*Files:* Save (kbd:[Ctrl+S]), File › Export STL, open a `.sc`.
+****
+
+== 1. Sketches
+
+A sketch is a 2D drawing on a plane. Start one with *New Sketch* (kbd:[S],
+type `sketch`, or the first button of the Model tab) and click one of the three
+origin planes: *XY* (Top) is the plate on the table, *XZ* (Front) and *YZ*
+(Right) stand up. The view turns to face the plane.
+
+video::new-sketch.mp4[width=720]
+
+.Drawing
+Pick *Rectangle* (kbd:[R]), click the first corner, type the width, kbd:[Tab],
+the height, kbd:[Enter]. Every number you type becomes a *dimension* on the
+drawing. *Circle* (kbd:[C]): click the centre, type the diameter. *Line*
+(kbd:[L]): click, click, …, kbd:[Esc].
+
+video::draw-dimension.mp4[width=720]
+
+.Constraints and dimensions
+A sketch is not a picture; it is a set of *rules* the solver keeps true:
+
+* *Dimensions* (kbd:[D]) fix a length, a distance, a diameter, an angle. Click
+  the thing (or two things) to measure, click where the number goes, type the
+  value.
+* *Constraints* fix relationships without numbers: two points *coincident*, a
+  line *horizontal* or *vertical*, two circles *equal*, two points *symmetric*
+  about an axis, a line *tangent* to an arc, a point at the *midpoint* of a line.
+  Many are added automatically while you draw (watch the small icons).
+
+Blue geometry can still move: grab a blue point with the mouse and it drags. Add
+dimensions and constraints until the palette on the right says *Fully
+constrained* and everything turns white. A fully constrained sketch changes only
+in the way you tell it to, which is the whole point of parametric modelling.
+
+.A fully constrained sketch: 2 dimensions for the rectangle, a diameter, 2 distances for one hole, symmetry and equality for the other three holes
+image::sketch-mode.png[width=800, link=../../../images/solidcraft/sketch-mode.png]
+
+TIP: Over-constrained edits are refused with a message, not silently ignored. If
+a dimension "cannot be added", something already fixes that size: find the
+constraint and delete it first.
+
+*Finish Sketch* (palette or the green tab) closes the sketch. Closed regions of
+the sketch are *profiles*, shaded blue; a circle inside a rectangle makes a hole
+in the rectangle's profile automatically.
+
+== 2. Features: extrude and fillet
+
+*Extrude* (kbd:[E]): click the profile, drag the arrow or type the distance,
+kbd:[Enter]. The dialog chooses *New Body* for the first solid; for later
+extrusions it offers *Join* (add material), *Cut* (remove) and *Intersect*. The
+extent can be a distance, *symmetric* around the sketch, *through all* or *to* a
+face.
+
+video::extrude.mp4[width=720]
+
+*Fillet* (kbd:[F]): click edges (Shift adds), type a radius. *Chamfer* is the same
+with a distance. *Hole* (kbd:[H]): click a face, set a diameter; the hole can be
+positioned by distances from two edges, which is often easier than drawing the
+circle in the sketch.
+
+.Fillet dialog with four selected edges
+image::fillet-dialog.png[width=800, link=../../../images/solidcraft/fillet-dialog.png]
+
+== 3. The timeline
+
+The *History* strip at the bottom lists the features in the order they are
+computed: Sketch → Extrude → Fillet. It is the design. Undo (kbd:[Ctrl+Z]) walks
+back through what *you did*; the timeline is what the model *is made of*.
+
+* *Double-click* a feature to edit it: the model rolls back to that point, the
+  dialog opens filled in, you change a value, press kbd:[Enter], and everything
+  after it is rebuilt.
+* Drag the *marker* at the end backwards to see the design as it was. Features
+  after the marker stay. A new feature is inserted at the marker.
+* Right-click a feature: *Suppress* (turn off without deleting), *Rename*,
+  *Delete* (asks when other features depend on it).
+
+video::edit-timeline.mp4[width=720]
+
+.Editing the extrude later: the fillets rebuild on the thicker plate
+image::timeline-edit.png[width=800, link=../../../images/solidcraft/timeline-edit.png]
+
+== 4. Parameters
+
+So far the plate is 60 × 40 with 4 mm holes 9 mm from the edge, and every one of
+those numbers lives in its own dimension. Change the width and the holes stay
+where they were. *User parameters* fix that.
+
+.Naming a value as you type it
+In *any* value box (a dimension, an extrude distance, a fillet radius) you can
+type `width = 60` instead of `60`. SolidCraft creates the user parameter `width`
+with the value 60 and that dimension now reads `width`. Later, double-clicking
+the dimension shows `width`, and typing `width = 80` there changes the parameter.
+
+video::name-parameter.mp4[width=720]
+
+.The Parameters dialog
+*Model › Configure › Parameters* (or kbd:[S], `param`) lists everything:
+
+* *User parameters* — the ones you named, with unit, expression, computed value
+  and a comment. *Add parameter* makes a new one.
+* *Model parameters* — every dimension and feature input, named `d1`, `d2`…,
+  grouped by the sketch or feature they belong to. Their expression can be a
+  number or anything using the user parameters.
+
+.The plate's six user parameters. Two are derived from others.
+image::parameters-dialog.png[width=800, link=../../../images/solidcraft/parameters-dialog.png]
+
+.Expressions
+A parameter's expression, a dimension's value and a feature's input can all be
+*expressions*:
+
+[cols="2,3",options="header"]
+|===
+|Expression |Meaning
+
+|`width / 2` |half the width
+|`hole_d * 2` |the hole centre is two diameters from the edge
+|`min(thickness, hole_inset / 2)` |the corner radius, never larger than half the inset
+|`2 * wall + 5 mm` |units are allowed and checked: a length plus an angle is an error
+|`floor((width - 10) / 8)` |a count: how many 8 mm slots fit
+|`1 in + 3 mm` |28.4 mm; `1/2 in` is half an inch
+|===
+
+Available: `+ - * / ^ %`, parentheses, `sin cos tan asin acos atan atan2 sqrt abs
+sign min max floor ceil round trunc mod exp ln log log10 pow hypot`, units `mm cm
+m in ft deg rad`. A cycle (`a` uses `b` uses `a`) is reported with its path.
+Renaming a parameter updates every expression that uses it; a parameter in use
+cannot be deleted.
+
+.Changing a parameter
+Edit the expression in the dialog and press kbd:[Enter]: the timeline rebuilds
+from the first feature that uses it. This is the moment to look for what you did
+*not* tie to the parameters.
+
+.`width = 100`: the holes followed the edges, the fillets followed the corners
+image::parameters-width-100.png[width=800, link=../../../images/solidcraft/parameters-width-100.png]
+
+TIP: Comment every parameter (the last column). In three weeks you will not
+remember whether `inset` was measured from the edge or from the centre.
+
+== 5. Saving and exporting
+
+* kbd:[Ctrl+S] saves the design as `name.sc`. This is the file you hand in and
+  the file you continue from next week.
+* *File › Export STL…* writes the mesh for the slicer. Choose *fine* quality for
+  parts with curves. *File › Export 3MF…* keeps several bodies apart as parts.
+* A `.sc` file is a ZIP with the design as JSON inside. Details in
+  xref:ui#files[What is where › Files].
+
+[[_task_parametric_mounting_plate]]
+== Task: parametric mounting plate
+
+Model the plate from the screenshots above: a rectangular plate with four
+mounting holes and rounded corners, fully driven by parameters. Then show that
+it survives a change of every parameter.
+
+.Checkpoints
+Each step has a downloadable `.sc` file you can open to compare with yours, or
+to continue from if you got stuck:
+
+[cols="1,3,2",options="header"]
+|===
+|Step |What is in it |File
+
+|1 |the sketch: rectangle 60 × 40 centred on the origin, four Ø 4.5 holes 9 mm
+from the edges, fully constrained with symmetry and equal constraints
+|link:../../../stls/solidcraft/plate-01-sketch.sc[plate-01-sketch.sc]
+
+|2 |extruded 4 mm, the body named *Plate* |link:../../../stls/solidcraft/plate-02-extruded.sc[plate-02-extruded.sc]
+|3 |corners filleted r = 4 |link:../../../stls/solidcraft/plate-03-fillets.sc[plate-03-fillets.sc]
+|4 |six user parameters, every dimension and feature input driven by them
+|link:../../../stls/solidcraft/plate-04-parametric.sc[plate-04-parametric.sc]
+|— |the exported mesh |link:../../../stls/solidcraft/plate.stl[plate.stl]
+|===
+
+image::plate-02-extruded.png[width=300] image::plate-03-fillets.png[width=300] image::plate-05-variant.png[width=300]
+
+=== Step 1: the sketch (15 min)
+
+. *New design* (millimetres). *New Sketch* on the *XY* plane.
+. *Rectangle › Center Rectangle*: click the origin, type `60`, kbd:[Tab], `40`,
+  kbd:[Enter]. If you used the 2-point rectangle instead, add a *Symmetry*
+  constraint of two opposite corners about the sketch's X axis and another
+  about Y so the origin stays in the middle.
+. *Circle* (kbd:[C]) near the top-right corner, diameter `4.5`.
+. *Dimension* (kbd:[D]): click the circle's centre, then the right side of the
+  rectangle, place the number, type `9`. Repeat with the top side.
+. Three more circles near the other corners (any size, anywhere nearby).
+. *Equal*: select all four circles, click Equal. *Symmetry*: top-left and
+  top-right centres about the vertical axis, then top and bottom pairs about the
+  horizontal axis (the sketch's own axes count as mirror lines).
+. The palette says *Fully constrained*. If not, drag a blue point to see what is
+  loose, and add the missing rule. *Finish Sketch*.
+
+=== Step 2 and 3: extrude and fillet (10 min)
+
+. *Extrude* (kbd:[E]), click the profile (the rectangle minus the holes is one
+  profile), distance `4`, kbd:[Enter].
+. *Fillet* (kbd:[F]), click the four vertical corner edges, radius `4`,
+  kbd:[Enter].
+. Right-click the extrude in the timeline, *Rename* to `Plate`. Save as
+  `plate.sc`.
+
+=== Step 4: make it parametric (25 min)
+
+. Open *Parameters*. Add, with comments:
++
+[cols="1,1,2",options="header"]
+|===
+|Name |Expression |Comment
+|`width` |`60` |plate size along X
+|`length` |`40` |plate size along Y
+|`thickness` |`4` |
+|`hole_d` |`4.5` |M4 clearance hole
+|`hole_inset` |`hole_d * 2` |hole centre from the edges
+|`corner_r` |`min(thickness, hole_inset / 2)` |never bigger than half the inset
+|===
+. Still in the dialog, open *Model parameters* and replace the sketch
+  dimensions: `60` → `width`, `40` → `length`, `4.5` → `hole_d`, both `9` →
+  `hole_inset`. (Alternatively edit the sketch and double-click each dimension.)
+. Double-click *Plate* in the timeline, distance `thickness`. Double-click the
+  fillet, radius `corner_r`.
+. Test: set `width` to `100`, `length` to `30`, `thickness` to `6`, `hole_d` to
+  `3.2`. The holes must stay two diameters from the edges and the corners must
+  still be round. Then set `hole_d` to `12` and explain what happens to
+  `corner_r`.
+. Save. *File › Export STL*.
+
+=== Hand in
+
+Your `plate.sc` with your own parameter values (not 60 × 40) and a sentence in
+the comment column of each parameter.
+
+== Common problems
+
+* *"The sketch is blue and I cannot see why."* Drag the blue bit. Whatever moves
+  is unconstrained. Typical: a circle's centre placed near a corner but not
+  dimensioned.
+* *Extrude makes two bodies.* The circles were not inside the rectangle, or a
+  line crossed the outline. Check the profile shading before finishing.
+* *Fillet refused ("larger than the neighbouring faces").* The radius is bigger
+  than the geometry around the edge, for example a corner between two holes.
+  That is precisely why `corner_r` uses `min()`.
+* *The hole moved when I changed the width.* A dimension still holds a number
+  instead of `hole_inset`. Look at *Model parameters* in the dialog.
+* *I changed `width` and nothing happened.* You edited the *value* column of a
+  model parameter that is driven by an expression; edit the user parameter
+  instead.

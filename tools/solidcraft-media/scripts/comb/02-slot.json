@@ -1,0 +1,8 @@
+{"commands": [
+  {"command": "sketch.create", "params": {"plane": "XZ", "name": "Slot profile"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, "-(comb_h + cable_d + base_t) / 2"], "corner": ["cable_d / 2", "-(comb_h + cable_d)"]}},
+  {"command": "sketch.fillet", "params": {"a": "l1", "b": "l2", "radius": "cable_d / 2"}},
+  {"command": "sketch.fillet", "params": {"a": "l1", "b": "l4", "radius": "cable_d / 2"}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"through_all": true, "direction": "symmetric", "operation": "cut", "name": "Slot"}}
+]}

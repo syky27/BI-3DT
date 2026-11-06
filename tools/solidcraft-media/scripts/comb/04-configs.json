@@ -1,0 +1,8 @@
+{"commands": [
+  {"command": "config.configure", "params": {"params": ["comb_w", "cable_d"]}},
+  {"command": "config.row", "params": {"name": "S", "values": {"param:comb_w": "50 mm", "param:cable_d": "4 mm"}}},
+  {"command": "config.row", "params": {"name": "M", "values": {"param:comb_w": "80 mm", "param:cable_d": "5 mm"}}},
+  {"command": "config.row", "params": {"name": "L", "values": {"param:comb_w": "120 mm", "param:cable_d": "8 mm"}}},
+  {"command": "config.activate", "params": {"row": "M"}},
+  {"command": "config.table", "params": {}}
+]}

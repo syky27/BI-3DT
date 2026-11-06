@@ -1,0 +1,343 @@
+= SolidCraft 3: Designing for change
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+.After this lesson you can
+* organise parameters so another person (or you in a month) can change the
+  design safely,
+* keep several *configurations* (sizes, variants) of one design in a table and
+  switch between them,
+* find the parameter values at which the design *breaks* with a *parameter
+  sweep* before anyone prints it,
+* export the right file for printing and know what *quality* means for an STL,
+* rebuild, render and measure a design from the *command line*, and turn a design
+  into a *script*.
+
+This lesson is the bridge to the parametric OpenSCAD homework: the same thinking
+(interface = parameters, everything else derived, test at the extremes) in a GUI
+tool.
+
+== Timetable (135 min)
+
+[cols="1,1,5",options="header"]
+|===
+|Min |Who |What
+
+|0–10 |teacher |Two boxes from the homework side by side; what was hard to
+change and why.
+|10–25 |teacher |*Parameter hygiene.* Favourites, comments, grouping by prefix,
+the Param Graph, renaming (references follow), the "one decision, one
+parameter" rule, text parameters for engraved labels, CSV import/export of
+parameters.
+|25–45 |teacher |*Configurations.* Configure columns, add rows S/M/L, Activate,
+Preview, a rule ("large parts use a thicker wall"), suppression of a feature
+per row (a variant without vents).
+|45–60 |teacher |*Checking.* Parameter Sweep over a range; reading the report;
+fixing a design so the whole range builds. Interference and Mass Center.
+|60–75 |teacher |*Out of the program.* Export STL/3MF/STEP and what quality
+does; bodies vs. components (five minutes of New Component and a joint);
+`solidcraft-cli run`, `snapshot`, `eval`, `script`; the MCP server in one
+sentence.
+|75–125 |students |xref:_task_parametric_cable_comb[Task: parametric cable comb in three sizes]
+|125–135 |all |Each pair shows their sweep report and one value that broke the
+design.
+|===
+
+The teacher's object comes from the students again (a spool holder, a drawer
+divider, a phone dock for a named phone, a name tag with a text parameter…).
+
+.Teacher's checklist of tools to show in this lesson
+****
+*Manage › Parameters:* favourites, comments, rename, delete (refused while in
+use), Param Graph, Export/Import CSV, a `text` parameter driving *Sketch Text*.
+*Manage › Configurations:* Configure (columns), Config Table, rows, Activate,
+Preview Row, Add rule, a *feature suppression* column.
+*Inspect:* Parameter Sweep (the `inspect.parameter_sweep` command: kbd:[S],
+`sweep`), Mass Center, Interference, Measure.
+*Assemble:* New Component, Create Components from Bodies, Joint (revolute), drive
+the joint. Only as an outlook.
+*File:* Export STL with quality, 3MF with bodies as parts, STEP, Save As JSON.
+*CLI:* `solidcraft-cli run`, `--save`, `--out`, `eval`, `snapshot`, `script`.
+****
+
+== 1. Parameter hygiene
+
+A design with twelve parameters is only useful if a stranger can tell which
+three they are supposed to change. In the Parameters dialog:
+
+* *Favourite* (the star) the parameters that are the design's *interface*:
+  `comb_w`, `cable_d`. They sort to the top.
+* *Comment* every parameter: what it is, in which direction, what limits it.
+* *Prefix* related parameters: `vent_w`, `vent_pitch`, `vent_count`.
+* Derived values are expressions, never typed numbers: `pitch = cable_d + wall`.
+* *Rename* freely; every expression, dimension and feature that uses the
+  parameter follows. *Delete* is refused while something still uses it, and the
+  message lists the users.
+* *Manage › Param Graph* draws the dependencies. A model parameter with a
+  number and no incoming arrow is a size you forgot to tie down.
+* *Export CSV* gives a table you can keep next to the design (or feed back with
+  *Import*).
+
+A *text* parameter (unit `text`) can drive *Sketch Text*: one design, engraved
+with each student's name.
+
+== 2. Configurations
+
+A *configuration* is a named row of parameter values (and optionally: which
+features are suppressed, which material or appearance each body has). *Model ›
+Configure › Config Table* opens the table.
+
+. *Configure* (the dropdown next to the button) chooses the *columns*: which
+  parameters and which features the rows control. The first row *Default* takes
+  the current values.
+. *Add configuration* adds a row; type the values. Rows can be copied from
+  another row.
+. *Activate* a row: the design rebuilds with those values. *Preview Row* rebuilds
+  a scratch copy and reports the effective values and matched rules without
+  touching the design.
+. *Rules* (below the table) run in order: "if `comb_w` ≥ 80 mm then drive
+  `wall` to `comb_w / 40`", "`cable_d` must be between 2 and 12 mm". A rule can
+  also *restrict* a value to a range or a list.
+
+video::config-activate.mp4[width=720]
+
+.The comb's configuration table with S, M and L rows
+image::config-table.png[width=800, link=../../../images/solidcraft/config-table.png]
+
+image::config-S.png[width=440, link=../../../images/solidcraft/config-S.png] image::config-L.png[width=440, link=../../../images/solidcraft/config-L.png]
+
+A *feature suppression* column turns a feature off in some rows: a variant
+without the vents, without the logo, without the chamfer for the draft print.
+
+Configurations are saved in the `.sc` file. When you export an STL, the *active*
+row is what you get, so export once per row and name the files accordingly.
+
+== 3. Checking a design across a range
+
+A parametric design is a promise: "any width between 40 and 150 mm builds". The
+*Parameter Sweep* keeps the promise honest. It rebuilds a *copy* of the design at
+each of a parameter's values and reports features that fail or warn, sketches
+whose solve flips, and joints that break. The design itself is untouched.
+
+Run it from command search (kbd:[S], `sweep`), or as a command in a script:
+
+[source,json]
+----
+{"command": "inspect.parameter_sweep",
+ "params": {"parameter": "comb_w", "from": 10, "to": 150, "steps": 14}}
+----
+
+The report for the comb checkpoint (link:../../../stls/solidcraft/comb-sweep-result.json[the full JSON]):
+
+[cols="1,1,4",options="header"]
+|===
+|`comb_w` |ok |what failed
+|10, 30, 40, 60, 70, 80, 100, 110, 130, 140, 150 |yes |
+|20, 50, 90, 120 |*no* |`Corners`: "the blend is larger than the neighbouring faces; the largest radius that fits is 0.5 mm"
+|===
+
+Four values out of fifteen break the fillet: at those widths the slot pattern
+lands so close to the end that the 2 mm corner fillet has no face left to sit
+on. The fix is a design decision, not a click: either guarantee an end wall
+(`slot_count = floor((comb_w - 2 * end_wall) / pitch)`), or make the fillet
+radius depend on the real end wall with `min()`, or tell the sweep that 20 mm is
+outside the promised range. Try all three; the sweep tells you when you are
+done.
+
+.The failing fillet at `comb_w = 20`, opened from the timeline
+image::feature-error-dialog.png[width=800, link=../../../images/solidcraft/feature-error-dialog.png]
+
+Other checks under *Inspect*: *Interference* between bodies (does the lid hit the
+box?), *Mass Center* (will it tip?), *Properties* for volume, which the slicer's
+filament estimate is based on.
+
+== 4. Getting the part out
+
+* *STL* is one mesh per export; *quality* standard / fine / finest sets how
+  closely triangles follow curved faces (a chord tolerance of 2·10⁻⁴, 5·10⁻⁵ or
+  10⁻⁵ of the body's size). Fine is right for anything round that must fit.
+* *3MF* keeps several bodies as separate objects (or, with *bodies as parts*,
+  as one object with parts) and carries colours. Prefer it for multi-body
+  designs; OrcaSlicer reads it directly.
+* *STEP* is exact geometry for other CAD programs and for the archive; it is
+  what you give a machine shop.
+* *Send to Slicer* opens the export directly in the slicer registered for 3MF
+  files.
+* *Save As JSON* writes the design as readable JSON; `git diff` on it shows
+  exactly which parameter changed between two commits.
+
+For the printing part of the course the rule is: `.sc` in the repository, STL
+or 3MF for the slicer, never the other way round.
+
+== 5. Bodies, components and joints (outlook)
+
+Everything so far lived in *bodies*. When parts are separate pieces that move or
+repeat, SolidCraft calls them *components*: *Assemble › New Component*, or
+*Create Components from Bodies* on an existing design. Components have their own
+origin, can be placed several times, and *joints* (rigid, revolute, slider,
+cylindrical, ball…) connect them so you can *drive* a hinge or a slider and
+check that nothing collides (*Inspect › Interference*, *contact sets*). Imported
+STEP assemblies keep their component tree.
+
+This course does not grade assemblies; if your semester project is a mechanism,
+the https://docs.solidcraft.io/guide/assemblies.html[assemblies chapter of the
+manual] is where to continue.
+
+== 6. The command line and scripts
+
+`solidcraft-cli` is the same program without the window. Three commands cover
+most uses:
+
+[source,sh]
+----
+# rebuild a design and export it; a failing feature stops the run
+solidcraft-cli run --in comb-04-configs.sc --out comb.stl --quality fine
+
+# measure it: volume, area, centre of mass, face/edge counts as JSON
+solidcraft-cli eval comb-04-configs.sc
+
+# a picture, from the iso view, without the ground grid
+solidcraft-cli snapshot comb-04-configs.sc --out comb.png --no-grid
+----
+
+A *script* is a JSON list of the same commands the toolbar runs. This one is the
+comb's first checkpoint:
+
+[source,json]
+----
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "comb_w", "expression": "80", "unit": "mm"}},
+  {"command": "parameters.add", "params": {"name": "comb_d", "expression": "20", "unit": "mm"}},
+  {"command": "parameters.add", "params": {"name": "comb_h", "expression": "15", "unit": "mm"}},
+  {"command": "sketch.create", "params": {"plane": "XY", "name": "Base outline"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, 0], "corner": ["comb_w / 2", "comb_d / 2"]}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"distance": "comb_h", "name": "Base", "body_name": "Comb"}}
+]}
+----
+
+[source,sh]
+----
+solidcraft-cli run 01-base.json --save comb-01-base.sc        # build and save
+solidcraft-cli run 02-slot.json --in comb-01-base.sc --save comb-02-slot.sc   # continue from a checkpoint
+solidcraft-cli script comb-04-configs.sc --out rebuild.json    # the other direction: design → script
+solidcraft-cli commands                                        # every command with its parameters
+----
+
+Every checkpoint on these pages was built exactly this way; the scripts are in
+`tools/solidcraft-media/scripts/` in the course repository. This is also how
+*the design becomes reproducible*: a script in Git, a `.sc` and an STL built
+from it in CI.
+
+The same commands are what an AI agent sends when `solidcraft-cli mcp` runs as
+an MCP server, and what `solidcraft --control PORT` accepts over a local socket.
+Not needed for the course; good to know when you want to generate a hundred
+name tags.
+
+[[_task_parametric_cable_comb]]
+== Task: parametric cable comb in three sizes
+
+A desk cable comb: a block with round-bottomed slots, one per cable. The number
+of slots is *computed* from the width and the cable diameter. Three
+configurations S, M, L. A sweep report that proves the promised range builds.
+
+.Checkpoints
+[cols="1,3,2",options="header"]
+|===
+|Step |What is in it |File
+
+|1 |eight parameters (two favourites: `comb_w`, `cable_d`; `pitch` and
+`slot_count` derived); base block *Comb*
+|link:../../../stls/solidcraft/comb-01-base.sc[comb-01-base.sc]
+
+|2 |one slot: a rectangle on XZ with sketch fillets `cable_d / 2` at the bottom
+corners, extruded symmetric through all as a Cut
+|link:../../../stls/solidcraft/comb-02-slot.sc[comb-02-slot.sc]
+
+|3 |rectangular pattern with quantity `slot_count`, spacing `pitch`, centred;
+corner fillets `wall`
+|link:../../../stls/solidcraft/comb-03-pattern.sc[comb-03-pattern.sc]
+
+|4 |configuration table with rows S (50 / 4), M (80 / 5), L (120 / 8)
+|link:../../../stls/solidcraft/comb-04-configs.sc[comb-04-configs.sc]
+
+|— |exports of the three rows and the sweep report
+|link:../../../stls/solidcraft/comb-S.stl[comb-S.stl],
+link:../../../stls/solidcraft/comb-M.stl[comb-M.stl],
+link:../../../stls/solidcraft/comb-L.stl[comb-L.stl],
+link:../../../stls/solidcraft/comb-M.3mf[comb-M.3mf],
+link:../../../stls/solidcraft/comb-M.step[comb-M.step],
+link:../../../stls/solidcraft/comb-sweep-result.json[comb-sweep-result.json]
+|===
+
+image::comb-02-slot.png[width=300] image::comb-03-pattern.png[width=300] image::comb-04-configs.png[width=300]
+
+=== Step 1: parameters first (10 min)
+
+Before any sketch, open *Parameters* and add:
+
+[cols="1,1,2",options="header"]
+|===
+|Name |Expression |Comment
+|`comb_w` ★ |`80` |overall width (X)
+|`comb_d` |`20` |depth (Y)
+|`comb_h` |`15` |height (Z)
+|`cable_d` ★ |`5` |cable diameter the slot takes
+|`wall` |`2` |tooth thickness between slots
+|`base_t` |`3` |solid floor under the slots
+|`pitch` |`cable_d + wall` |slot to slot
+|`slot_count` |`floor((comb_w - wall) / pitch)` |computed, unit *none*
+|===
+
+Then a centred rectangle on XY with half-sides `comb_w / 2`, `comb_d / 2`,
+extruded `comb_h`; body *Comb*.
+
+=== Step 2 and 3: the slot and its pattern (15 min)
+
+. Sketch on *XZ*. Centred rectangle: centre `[0, -(comb_h + cable_d + base_t) / 2]`,
+  corner `[cable_d / 2, -(comb_h + cable_d)]` (it sticks out of the top on
+  purpose). *Sketch Fillet* on the two bottom corners, radius `cable_d / 2`: a
+  round bottom. Finish.
+. Extrude: *Symmetric*, *Through All*, *Cut*. Rename `Slot`.
+. *Rectangular Pattern* of the feature `Slot`: direction X, quantity
+  `slot_count`, spacing `pitch`, alignment *centre*.
+. *Fillet* the four vertical edges, radius `wall`.
+. Change `cable_d` to 8 and to 3. Count the slots.
+
+=== Step 4: three sizes (10 min)
+
+. *Configure*: columns `comb_w` and `cable_d`.
+. *Config Table*: rows `S` = 50 / 4, `M` = 80 / 5, `L` = 120 / 8. Activate each
+  and look.
+. Add a rule: when `comb_w` ≥ 100 mm, drive `wall` to `3`.
+. Export an STL per row, named `comb-S.stl` etc., quality *fine*.
+
+=== Step 5: prove it (15 min)
+
+. Run the parameter sweep over `comb_w` from 10 to 150 in 14 steps, and over
+  `cable_d` with the values 1, 2, 3, 5, 8, 10, 12, 20.
+. Read the report. For each failing value decide: fix the design, or document
+  the limit as a rule in the configuration table (a *range* restriction).
+. Repeat until the sweep over your promised range is clean.
+. From a terminal: `solidcraft-cli eval comb.sc` and note the volume of the M
+  row; `solidcraft-cli snapshot comb.sc --out comb.png`.
+
+=== Hand in
+
+`comb.sc` with the three rows, the three STLs, `comb.png`, and the sweep report
+(`--json-out sweep.json`) of the final design with no failures in the promised
+range. Write the promised range into the comments of `comb_w` and `cable_d`.
+
+== Common problems
+
+* *`slot_count` is 0 or negative at small widths.* Guard it: `max(1, floor(…))`
+  and let the sweep confirm.
+* *Fillet fails at some widths only.* A slot lands on the corner. Reserve an end
+  wall in the count or limit the radius with `min()`; see section 3.
+* *The S row exports the M geometry.* The export takes the *active* row.
+  Activate, then export.
+* *A rule does nothing.* Rules run on *Activate* and *Preview*, not on every
+  parameter edit; and the driven column must exist in the table.
+* *`solidcraft-cli` not found.* On Linux packages it is `solidcraft-cli`, with
+  Snap `solidcraft.cli`, on macOS it is a separate zip on the releases page.

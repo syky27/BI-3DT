@@ -1,0 +1,151 @@
+= SolidCraft: Installation
+:toc:
+:imagesdir: ../../../images/solidcraft/
+
+SolidCraft is free and open source (MIT or Apache-2.0), so unlike Fusion 360 there
+is no registration, no student licence and no cloud account. Install it on your own
+laptop before the first lesson and bring the laptop (and a mouse 🖱️) to class.
+
+TIP: There is also a browser version at https://solidcraft.io/app with no
+installation. It is handy for a quick look, but designs are kept in the browser's
+private storage, so use the desktop app for the lessons and the homework.
+
+== Which version
+
+SolidCraft ships a new release almost every day. Any version *0.30 or newer* works
+for these materials; the screenshots are from 0.30.1. Design files saved by a newer
+version will not open in an older one, so whoever you share a file with needs at
+least your version. Both desktop and CLI are the same download.
+
+== Linux
+
+Prefer your distribution's package system so the app updates with everything else.
+Every package also installs `solidcraft-cli`, which we use in lesson 3.
+
+=== Flatpak (Fedora, Debian/Ubuntu, Mint, openSUSE, Arch, …)
+
+The project runs its own Flatpak repository on top of Flathub. The same commands
+work on every distribution that has Flatpak installed.
+
+[source,sh]
+----
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --user --if-not-exists solidcraft https://docs.solidcraft.io/flatpak/solidcraft.flatpakrepo
+flatpak install --user solidcraft io.tangencylabs.solidcraft
+flatpak run io.tangencylabs.solidcraft
+----
+
+Later updates come with `flatpak update --user`.
+
+=== Snap (Ubuntu and anything with snapd)
+
+[source,sh]
+----
+sudo snap install solidcraft
+solidcraft            # or from the application menu
+solidcraft.cli --version
+----
+
+The snap can open files in your home folder; for USB drives run
+`sudo snap connect solidcraft:removable-media` once.
+
+=== Fedora, openSUSE (RPM)
+
+[source,sh]
+----
+sudo dnf install https://github.com/tangency-labs/solidcraft/releases/latest/download/solidcraft-linux-x86_64.rpm
+----
+
+On openSUSE use `sudo zypper install` with the same URL. ARM64 machines take
+`solidcraft-linux-aarch64.rpm`.
+
+=== Debian, Ubuntu, Mint (DEB)
+
+[source,sh]
+----
+curl -LO https://github.com/tangency-labs/solidcraft/releases/latest/download/solidcraft-linux-x86_64.deb
+sudo apt install ./solidcraft-linux-x86_64.deb
+----
+
+=== Arch Linux
+
+[source,sh]
+----
+curl -LO https://github.com/tangency-labs/solidcraft/releases/latest/download/solidcraft-linux-x86_64.pkg.tar.zst
+sudo pacman -U solidcraft-linux-x86_64.pkg.tar.zst
+----
+
+=== NixOS / Nix
+
+[source,sh]
+----
+nix run github:tangency-labs/solidcraft#solidcraft
+----
+
+=== AppImage (any distribution, no root)
+
+Download `solidcraft-linux-x86_64.AppImage` from the
+https://github.com/tangency-labs/solidcraft/releases/latest[releases page], make it
+executable (`chmod +x`) and run it. The first start adds a menu entry.
+AppImageLauncher 2.x cannot start it; update to 3.0 or remove it.
+
+NOTE: SolidCraft draws with the GPU (Vulkan through wgpu). On a fresh virtual
+machine without 3D acceleration it falls back to software rendering, which works
+but is slow.
+
+== macOS
+
+With https://brew.sh[Homebrew]:
+
+[source,sh]
+----
+brew tap tangency-labs/tap
+brew install --cask solidcraft
+----
+
+Without Homebrew: download `solidcraft-macos-universal.dmg` from the
+https://github.com/tangency-labs/solidcraft/releases/latest[releases page], open it
+and drag *SolidCraft* into *Applications*. One disk image covers Apple silicon and
+Intel. The app is signed and notarized, so it opens without any Gatekeeper tricks.
+
+The command-line tool comes separately as `solidcraft-cli-<version>-macos-universal.zip`
+on the same page; unpack it into a folder on your `PATH` (for example
+`/usr/local/bin`). You only need it in lesson 3.
+
+== Windows
+
+With winget (Windows 10 and 11):
+
+[source,powershell]
+----
+winget install bherbruck.SolidCraft
+----
+
+Or download `solidcraft-windows-x64.msi` from the
+https://github.com/tangency-labs/solidcraft/releases/latest[releases page] and run
+it. There are also ARM64 and 32-bit installers and a portable zip that runs without
+installing. The installers are not code-signed yet: when SmartScreen complains,
+choose *More info* and then *Run anyway*.
+
+== Check that it works
+
+Start SolidCraft. You should see the start page; click *Sample Plate* under
+*Samples*. A plate with holes appears and you can orbit it with the right mouse
+button. If the window stays black, see the
+https://docs.solidcraft.io/guide/troubleshooting.html[troubleshooting page] (usually
+a graphics driver problem).
+
+.The start page after installation
+image::start.png[width=720, link=../../../images/solidcraft/start.png]
+
+Also check the command-line tool, which we use in lesson 3:
+
+[source,sh]
+----
+solidcraft-cli --version
+----
+
+== Updating
+
+The app checks for updates itself (*Help › Check for updates*). With Flatpak, Snap,
+Homebrew or winget, update the way you update everything else.

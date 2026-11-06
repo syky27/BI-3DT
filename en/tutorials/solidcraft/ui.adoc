@@ -1,0 +1,174 @@
+= SolidCraft: What is where
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+Ten minutes with this page before lesson 1 and the window will already be
+familiar. All screenshots are from SolidCraft 0.30.1 with the default dark theme
+(Preferences › Appearance has a light one).
+
+== The window
+
+.The SolidCraft window with a design open
+image::window-callouts.png[width=900, link=../../../images/solidcraft/window-callouts.png]
+
+. *Title bar* — the *File* menu (New, Open, Save, Save As, Export…), undo/redo, the
+  home button (start page) and one tab per open design. A dot after the name marks
+  unsaved changes. On the right: Report a bug, Preferences (gear), Help.
+. *Toolbar* — tabs *Model*, *Surface*, *Assemble*, *Insert*, *Inspect*, *Manage*,
+  *View*… Each tab is split into panels (Sketch, Create, Modify, Arrange,
+  Configure, Construct). Click a panel's name for every command in it. While you
+  edit a sketch a green *Sketch* tab appears and takes over.
+. *Browser* — the design as a tree: document settings and units, named views, the
+  *Origin* with its three planes XY, XZ, YZ (also called Top, Front, Right),
+  *Bodies*, *Sketches*, construction planes, *Features*. The eye shows or hides an
+  item; right-click gives its menu.
+. *Viewport* — the model. Left click selects, Shift adds to the selection, click
+  again on the same spot to cycle through what is under the cursor.
+. *Axis view* — click an axis to look along it, the house returns to the Home view.
+. *Navigation bar* — orbit, pan, zoom, fit, look at, home, visual style, display
+  settings (grid, shadows).
+. *History* — the timeline: one icon per feature in the order they are computed.
+  Double-click an icon to edit that feature, drag the marker at the end back in
+  time to see how the design looked, right-click for suppress, rename, delete.
+. *Command search* — kbd:[S]. Type the beginning of any command (for example
+  `fillet`) and run it without hunting for the button.
+
+== Moving around
+
+[cols="1,2",options="header"]
+|===
+|Action |How
+
+|Orbit |drag with the *right* mouse button (Shift snaps to the nearest standard view)
+|Pan |drag with the *middle* button (or the wheel pressed)
+|Zoom |mouse wheel, zooms at the pointer
+|Fit everything into view |kbd:[F6], or the frame icon in the navigation bar
+|Standard views |kbd:[Ctrl+1] front, kbd:[Ctrl+5] top, kbd:[Ctrl+7] isometric… or click the axis view
+|Look straight at a face, plane or sketch |select it and press kbd:[Ctrl+8]
+|Home |double-click the middle button, or the house above the axis view
+|Trackpad |pinch zooms, two-finger scroll pans; Preferences › Navigation has a *Touchpad* preset where Shift+move pans and Alt+move orbits without any button
+|===
+
+If you come from Fusion, SolidWorks, Inventor, Blender or OpenSCAD, Preferences
+› Navigation › Mouse preset switches to that program's mouse mapping.
+
+.Front and top view of the same plate (kbd:[Ctrl+1], kbd:[Ctrl+5])
+image::view-front.png[width=440, link=../../../images/solidcraft/view-front.png] image::view-top.png[width=440, link=../../../images/solidcraft/view-top.png]
+
+== Sketch mode
+
+.Editing a sketch: the Sketch tab, the sketch palette and dimensions
+image::sketch-mode.png[width=900, link=../../../images/solidcraft/sketch-mode.png]
+
+While a sketch is open:
+
+* the green *Sketch* tab holds the drawing tools (Line, Rectangle, Circle, Arc,
+  Polygon, Slot, Text), the modify tools (Trim, Offset, Fillet, Mirror, Pattern),
+  *Dimension* and the constraint buttons (horizontal/vertical, coincident,
+  tangent, equal, parallel, perpendicular, symmetry…), *Project* for bringing
+  model edges into the sketch and *Finish Sketch*;
+* the *sketch palette* on the right shows the sketch's state. "*Fully
+  constrained*" means nothing can move any more; before that it tells you how
+  many degrees of freedom are left. Under-constrained curves are drawn *blue*,
+  fully constrained ones *white*;
+* the small square icons on the curves are *constraints*. Hover one to see what
+  it does, click it and press kbd:[Delete] to remove it;
+* the numbers are *dimensions*. Double-click one to change its value, and the
+  value can be an expression (`width / 2`) or a parameter name.
+
+The most useful keys: kbd:[L] line, kbd:[R] rectangle, kbd:[C] circle,
+kbd:[D] dimension, kbd:[X] toggle construction geometry, kbd:[T] trim,
+kbd:[O] offset, kbd:[P] project, kbd:[Esc] cancels the tool.
+
+== Dialogs
+
+Every feature opens a dialog on the right. The first row is usually a
+*selection* (profiles, faces, edges): click in the viewport to fill it. Number
+fields take expressions and parameter names. Enter is the same as OK, Esc
+cancels. A red text at the bottom means the feature cannot be built with these
+inputs and explains why.
+
+.The Extrude dialog, here editing an existing feature whose distance is the parameter `thickness`
+image::extrude-dialog.png[width=900, link=../../../images/solidcraft/extrude-dialog.png]
+
+[[files]]
+== Files
+
+=== The design file `.sc`
+
+A design is saved as one file with the extension `.sc`. It is a ZIP archive, so
+you can look inside with `unzip -l`:
+
+----
+$ unzip -l plate-04-parametric.sc
+  Length      Name
+  ---------   ----
+         37   container.json      <1>
+      13877   document.json       <2>
+----
+<1> says which container format this is (`solidcraft-container/1`)
+<2> the whole parametric document: units, user parameters, every sketch with
+    its curves, constraints and dimensions, every feature with its inputs, the
+    configuration table, named views, appearances
+
+Imported STEP files, meshes and images are stored next to it in a `blobs/`
+folder, named by their SHA-256 hash, so a design that imports a 50 MB scan does
+not become slow to open. What is *not* in the file is the computed geometry:
+SolidCraft rebuilds the bodies from the timeline when the file opens (a cache of
+the result can be saved so large designs open faster).
+
+Things worth knowing:
+
+* *Save As › JSON* writes the same document as a readable `document.json`
+  without the ZIP. Handy for diffs in Git and for looking at what a feature
+  stores. It opens like any other design.
+* Older versions cannot open files saved by newer versions. Keep the class on
+  the same version, and keep a copy before you update.
+* SolidCraft autosaves unsaved changes to a recovery folder every few minutes
+  and offers to recover them after a crash. It also keeps a `.bak` next to your
+  file on every save.
+* One design file holds one or more bodies, and can hold components (parts
+  placed in an assembly). For this course one file = one part.
+* Files `.solidcraft` from the first releases still open.
+
+=== The File menu
+
+.File menu: open, insert, save, export
+image::file-menu.png[width=400, link=../../../images/solidcraft/file-menu.png]
+
+[cols="1,2,1",options="header"]
+|===
+|Format |Use |Direction
+
+|`.sc` / `.json` |the design itself, editable, what you hand in |save, open
+|STL |mesh for the slicer (choose quality *fine* for round parts) |export, import (as a mesh body)
+|3MF |mesh for the slicer with colours and several bodies as parts |export, import
+|STEP |exact solids for other CAD programs |export, import
+|OBJ, glTF |meshes with materials, for Blender and the web |export / import
+|DXF, SVG |2D outlines for laser cutting; a sketch imports them |export, import into a sketch
+|PNG |a render of the view (*Inspect › Render*, or `solidcraft-cli snapshot`) |export
+|===
+
+NOTE: A mesh (STL, 3MF) imported into SolidCraft is a *mesh body*: it renders,
+measures and exports, but sketch-based features cannot cut or join it. Keep the
+`.sc` file of anything you want to change later.
+
+=== What to submit
+
+For the lesson tasks and the homework always hand in *the `.sc` design*, not
+only the STL. The design is what we grade: we open it, change a parameter and
+expect the part to rebuild. An STL cannot do that.
+
+== Preferences and help
+
+* Preferences (gear in the title bar): theme, units for new designs, mouse preset,
+  what happens when a sketch ends, graphics quality.
+* *Help › Keyboard Shortcuts* lists every shortcut; *File › Keyboard Shortcuts*
+  changes them.
+* *Help › Documentation* opens the manual, https://docs.solidcraft.io/.
+* *Report a bug* drafts a GitHub issue with the diagnostic data; nothing is sent
+  until you post it.
+
+.Preferences
+image::preferences.png[width=700, link=../../../images/solidcraft/preferences.png]

@@ -1,0 +1,155 @@
+= SolidCraft: Instalace
+:toc:
+:imagesdir: ../../../images/solidcraft/
+
+SolidCraft je svobodný software s otevřeným kódem (licence MIT nebo Apache-2.0),
+takže na rozdíl od Fusion 360 nepotřebujete registraci, studentskou licenci ani
+cloudový účet. Nainstalujte si ho na vlastní notebook před prvním cvičením
+a přineste ho (i s myší 🖱️) na hodinu.
+
+TIP: Existuje i verze v prohlížeči na https://solidcraft.io/app bez instalace.
+Hodí se na rychlé vyzkoušení, ale návrhy ukládá do soukromého úložiště
+prohlížeče, proto na cvičení i na úkol používejte desktopovou aplikaci.
+
+== Která verze
+
+SolidCraft vydává novou verzi téměř denně. Pro tyto materiály stačí verze
+*0.30 nebo novější*; snímky obrazovky jsou z verze 0.30.1. Soubor uložený
+novější verzí se ve starší neotevře, takže kdo má otevřít váš soubor, potřebuje
+aspoň vaši verzi. Desktop i CLI jsou ve stejném balíčku.
+
+== Linux
+
+Dejte přednost balíčkovacímu systému své distribuce, aby se aplikace
+aktualizovala spolu se vším ostatním. Každý balíček instaluje i
+`solidcraft-cli`, které použijeme ve 3. lekci.
+
+=== Flatpak (Fedora, Debian/Ubuntu, Mint, openSUSE, Arch, …)
+
+Projekt provozuje vlastní Flatpak repozitář nad Flathubem. Stejné příkazy
+fungují v každé distribuci, která má Flatpak.
+
+[source,sh]
+----
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --user --if-not-exists solidcraft https://docs.solidcraft.io/flatpak/solidcraft.flatpakrepo
+flatpak install --user solidcraft io.tangencylabs.solidcraft
+flatpak run io.tangencylabs.solidcraft
+----
+
+Aktualizace pak dělá `flatpak update --user`.
+
+=== Snap (Ubuntu a cokoli se snapd)
+
+[source,sh]
+----
+sudo snap install solidcraft
+solidcraft            # nebo z nabídky aplikací
+solidcraft.cli --version
+----
+
+Snap otevře soubory v domovském adresáři; pro USB disky spusťte jednou
+`sudo snap connect solidcraft:removable-media`.
+
+=== Fedora, openSUSE (RPM)
+
+[source,sh]
+----
+sudo dnf install https://github.com/tangency-labs/solidcraft/releases/latest/download/solidcraft-linux-x86_64.rpm
+----
+
+Na openSUSE použijte `sudo zypper install` se stejnou adresou. Pro ARM64
+vezměte `solidcraft-linux-aarch64.rpm`.
+
+=== Debian, Ubuntu, Mint (DEB)
+
+[source,sh]
+----
+curl -LO https://github.com/tangency-labs/solidcraft/releases/latest/download/solidcraft-linux-x86_64.deb
+sudo apt install ./solidcraft-linux-x86_64.deb
+----
+
+=== Arch Linux
+
+[source,sh]
+----
+curl -LO https://github.com/tangency-labs/solidcraft/releases/latest/download/solidcraft-linux-x86_64.pkg.tar.zst
+sudo pacman -U solidcraft-linux-x86_64.pkg.tar.zst
+----
+
+=== NixOS / Nix
+
+[source,sh]
+----
+nix run github:tangency-labs/solidcraft#solidcraft
+----
+
+=== AppImage (libovolná distribuce, bez roota)
+
+Stáhněte `solidcraft-linux-x86_64.AppImage` ze
+https://github.com/tangency-labs/solidcraft/releases/latest[stránky vydání],
+nastavte mu právo spouštění (`chmod +x`) a spusťte. První start přidá položku
+do nabídky. AppImageLauncher 2.x ho spustit neumí; aktualizujte na 3.0 nebo ho
+odstraňte.
+
+NOTE: SolidCraft kreslí přes GPU (Vulkan přes wgpu). Na čerstvém virtuálním
+stroji bez 3D akcelerace přepne na softwarové vykreslování, které funguje, ale
+je pomalé.
+
+== macOS
+
+Přes https://brew.sh[Homebrew]:
+
+[source,sh]
+----
+brew tap tangency-labs/tap
+brew install --cask solidcraft
+----
+
+Bez Homebrew: stáhněte `solidcraft-macos-universal.dmg` ze
+https://github.com/tangency-labs/solidcraft/releases/latest[stránky vydání],
+otevřete ho a přetáhněte *SolidCraft* do *Applications*. Jeden obraz disku je
+pro Apple silicon i Intel. Aplikace je podepsaná a notarizovaná, takže se
+otevře bez obcházení Gatekeeperu.
+
+Nástroj pro příkazovou řádku je na stejné stránce zvlášť jako
+`solidcraft-cli-<verze>-macos-universal.zip`; rozbalte ho do adresáře v `PATH`
+(např. `/usr/local/bin`). Potřebujete ho až ve 3. lekci.
+
+== Windows
+
+Přes winget (Windows 10 a 11):
+
+[source,powershell]
+----
+winget install bherbruck.SolidCraft
+----
+
+Nebo stáhněte `solidcraft-windows-x64.msi` ze
+https://github.com/tangency-labs/solidcraft/releases/latest[stránky vydání]
+a spusťte. Existují i instalátory pro ARM64 a 32bitová okna a přenosný zip bez
+instalace. Instalátory zatím nejsou podepsané: když si SmartScreen stěžuje,
+zvolte *More info* a pak *Run anyway*.
+
+== Ověření
+
+Spusťte SolidCraft. Měla by se ukázat úvodní stránka; v sekci *Samples*
+klikněte na *Sample Plate*. Objeví se destička s otvory, kterou můžete otáčet
+pravým tlačítkem myši. Pokud zůstane okno černé, podívejte se na
+https://docs.solidcraft.io/guide/troubleshooting.html[stránku řešení potíží]
+(obvykle jde o ovladač grafiky).
+
+.Úvodní stránka po instalaci
+image::start.png[width=720, link=../../../images/solidcraft/start.png]
+
+Zkontrolujte i nástroj pro příkazovou řádku, který použijeme ve 3. lekci:
+
+[source,sh]
+----
+solidcraft-cli --version
+----
+
+== Aktualizace
+
+Aplikace si aktualizace hlídá sama (*Help › Check for updates*). S Flatpakem,
+Snapem, Homebrew nebo wingetem aktualizujte stejně jako všechno ostatní.

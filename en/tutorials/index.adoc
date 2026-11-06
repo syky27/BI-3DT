@@ -15,7 +15,8 @@ xref:reprap#[RepRap], xref:git#[Git], xref:openscad#[OpenSCAD: Light Introductio
 |3. |02.03.2026 |xref:openscad#[OpenSCAD: Advanced]
 |https://github.com/3DprintFIT/B252A-OpenSCAD2-Assignment[3]
 
-|4. |09.03.2026 |xref:fusion#[Fusion 360] – 🖱️  bring your own mouse
+|4. |09.03.2026 |xref:solidcraft#[SolidCraft 1: From sketch to solid] – 🖱️  bring your own mouse
+(xref:solidcraft/lesson2#[lesson 2] and xref:solidcraft/lesson3#[lesson 3] follow in the next weeks; see the xref:solidcraft#[SolidCraft page])
 |3
 
 |5. |16.03.2026 |xref:mesh#[Mesh] – 🖱️  bring your own mouse

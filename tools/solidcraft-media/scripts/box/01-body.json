@@ -1,0 +1,10 @@
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "box_w", "expression": "60", "unit": "mm", "comment": "outer width (X)"}},
+  {"command": "parameters.add", "params": {"name": "box_l", "expression": "40", "unit": "mm", "comment": "outer length (Y)"}},
+  {"command": "parameters.add", "params": {"name": "box_h", "expression": "30", "unit": "mm", "comment": "outer height (Z)"}},
+  {"command": "parameters.add", "params": {"name": "wall", "expression": "2", "unit": "mm", "comment": "wall thickness, 5 perimeters of 0.4 mm"}},
+  {"command": "sketch.create", "params": {"plane": "XY", "name": "Box outline"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, 0], "corner": ["box_w / 2", "box_l / 2"]}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"distance": "box_h", "name": "Box body", "body_name": "Box"}}
+]}

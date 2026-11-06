@@ -1,0 +1,11 @@
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "vent_w", "expression": "2", "unit": "mm", "comment": "vent slot width"}},
+  {"command": "parameters.add", "params": {"name": "vent_pitch", "expression": "vent_w * 3", "unit": "mm"}},
+  {"command": "parameters.add", "params": {"name": "vent_margin", "expression": "wall * 3", "unit": "mm", "comment": "solid band at top and bottom"}},
+  {"command": "parameters.add", "params": {"name": "vent_count", "expression": "floor((box_w - 2 * wall - vent_pitch) / vent_pitch)", "unit": "", "comment": "as many slots as fit"}},
+  {"command": "sketch.create", "params": {"plane": "XZ", "name": "Vent slot"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, "-box_h / 2"], "corner": ["vent_w / 2", "-(box_h - vent_margin)"]}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"through_all": true, "direction": "symmetric", "operation": "cut", "targets": ["Box"], "name": "Vent"}},
+  {"command": "solid.pattern.rectangular", "params": {"features": ["Vent"], "dir1": [1, 0, 0], "count1": "vent_count", "spacing1": "vent_pitch", "alignment": "center", "name": "Vents"}}
+]}

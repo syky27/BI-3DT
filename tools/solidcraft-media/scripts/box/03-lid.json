@@ -1,0 +1,11 @@
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "lid_h", "expression": "8", "unit": "mm", "comment": "how far the lid reaches down"}},
+  {"command": "parameters.add", "params": {"name": "clearance", "expression": "0.3", "unit": "mm", "comment": "gap per side so the lid slides on"}},
+  {"command": "parameters.add", "params": {"name": "lid_gap", "expression": "15", "unit": "mm", "comment": "space between box and lid in the design, for viewing only"}},
+  {"command": "construct.plane.offset", "params": {"base": "XY", "offset": "box_h + lid_gap", "name": "Lid plane"}},
+  {"command": "sketch.create", "params": {"plane": "Lid plane", "name": "Lid outline"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, 0], "corner": ["box_w / 2 + wall + clearance", "box_l / 2 + wall + clearance"]}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"distance": "lid_h", "operation": "new_body", "name": "Lid body", "body_name": "Lid"}},
+  {"command": "solid.shell", "params": {"faces": [[0, 0, 45]], "thickness": "wall", "name": "Lid hollow", "body": "Lid"}}
+]}

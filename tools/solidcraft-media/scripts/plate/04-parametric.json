@@ -1,0 +1,12 @@
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "width",  "expression": "60", "unit": "mm", "comment": "plate size along X"}},
+  {"command": "parameters.add", "params": {"name": "length", "expression": "40", "unit": "mm", "comment": "plate size along Y"}},
+  {"command": "parameters.add", "params": {"name": "thickness", "expression": "4", "unit": "mm"}},
+  {"command": "parameters.add", "params": {"name": "hole_d", "expression": "4.5", "unit": "mm", "comment": "M4 clearance hole"}},
+  {"command": "parameters.add", "params": {"name": "hole_inset", "expression": "hole_d * 2", "unit": "mm", "comment": "hole centre from the edges"}},
+  {"command": "parameters.add", "params": {"name": "corner_r", "expression": "min(thickness, hole_inset / 2)", "unit": "mm", "comment": "never bigger than half the inset"}},
+  {"command": "parameters.change", "params": {"changes": {"d1": "width", "d2": "length", "d3": "hole_d", "d4": "hole_inset", "d5": "hole_inset"}}},
+  {"command": "timeline.edit", "params": {"feature": "Plate", "set": {"extent": {"distance": "thickness"}}}},
+  {"command": "timeline.edit", "params": {"feature": "Corners", "set": {"radius": "corner_r"}}},
+  {"command": "parameters.list", "params": {}}
+]}

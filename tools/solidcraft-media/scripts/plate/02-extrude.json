@@ -1,0 +1,3 @@
+{"commands": [
+  {"command": "solid.extrude", "params": {"sketch": "Plate outline", "distance": 4, "name": "Plate"}}
+]}

@@ -1,0 +1,315 @@
+[
+  {
+    "parameter": "comb_w",
+    "results": [
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 18.3,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 10.0,
+        "warned": []
+      },
+      {
+        "failed": [
+          {
+            "error": "not supported yet: the blend is larger than the neighbouring faces; the largest radius that fits is 0.5 mm",
+            "feature": 6,
+            "name": "Corners"
+          }
+        ],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 68.5,
+        "ok": false,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 20.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 47.8,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 30.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 58.9,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 40.0,
+        "warned": []
+      },
+      {
+        "failed": [
+          {
+            "error": "not supported yet: the blend is larger than the neighbouring faces; the largest radius that fits is 1.5 mm",
+            "feature": 6,
+            "name": "Corners"
+          }
+        ],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 118.2,
+        "ok": false,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 50.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 75.3,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 60.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 85.5,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 70.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 0.1,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 80.0,
+        "warned": []
+      },
+      {
+        "failed": [
+          {
+            "error": "not supported yet: the blend is larger than the neighbouring faces; the largest radius that fits is 0.5 mm",
+            "feature": 6,
+            "name": "Corners"
+          }
+        ],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 196.9,
+        "ok": false,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 90.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 116.7,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 100.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 132.3,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 110.0,
+        "warned": []
+      },
+      {
+        "failed": [
+          {
+            "error": "not supported yet: the blend is larger than the neighbouring faces; the largest radius that fits is 1.5 mm",
+            "feature": 6,
+            "name": "Corners"
+          }
+        ],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 245.1,
+        "ok": false,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 120.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 145.2,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 130.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 148.5,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 140.0,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 163.2,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 150.0,
+        "warned": []
+      }
+    ],
+    "summary": {
+      "failed": 4,
+      "joints_flipped": 0,
+      "joints_lost": 0,
+      "ok": 11,
+      "sketches_failed": 0,
+      "sketches_flipped": 0,
+      "slowest_ms": 245.1,
+      "values": 15
+    }
+  },
+  {
+    "parameter": "cable_d",
+    "results": [
+      {
+        "failed": [
+          {
+            "error": "not supported yet: the blend is larger than the neighbouring faces; the largest radius that fits is 0.5 mm",
+            "feature": 6,
+            "name": "Corners"
+          }
+        ],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 356.7,
+        "ok": false,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 1,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 163.0,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 2,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 130.3,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 3,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 0.1,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 5,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 61.9,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 8,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 57.8,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 10,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 55.5,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 12,
+        "warned": []
+      },
+      {
+        "failed": [],
+        "joints_flipped": [],
+        "joints_lost": [],
+        "ms": 41.9,
+        "ok": true,
+        "sketches_failed": [],
+        "sketches_flipped": [],
+        "value": 20,
+        "warned": []
+      }
+    ],
+    "summary": {
+      "failed": 1,
+      "joints_flipped": 0,
+      "joints_lost": 0,
+      "ok": 7,
+      "sketches_failed": 0,
+      "sketches_flipped": 0,
+      "slowest_ms": 356.7,
+      "values": 8
+    }
+  }
+]

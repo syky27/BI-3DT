@@ -1,0 +1,302 @@
+= SolidCraft 2: Features, faces and expressions
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+.After this lesson you can
+* sketch on a face of a body and on a *construction plane*,
+* use *Revolve*, *Shell*, *Chamfer*, *Mirror* and *Patterns* and know when each
+  is the better tool,
+* keep several *bodies* in one design and cut one with a feature without
+  touching the other,
+* write expressions that *compute* a design: counts with `floor()`, limits with
+  `min()`/`max()`, clearances, units,
+* read the inside of a part with *Section Analysis* and measure it.
+
+== Timetable (135 min)
+
+[cols="1,1,5",options="header"]
+|===
+|Min |Who |What
+
+|0–10 |teacher |Homework plates on screen: open two, change `width`, see what
+survived. Recap of constraints and parameters.
+|10–30 |teacher |*Sketching on faces and planes.* New Sketch on a body's face;
+*Project* (kbd:[P]) brings edges into the sketch; *Offset Plane* at a
+parametric distance; sketching on it; why an origin plane or construction plane
+is a more stable reference than a face.
+|30–50 |teacher |*More features.* Revolve (a knob, a bottle); Shell (open a box,
+wall thickness as a parameter); Chamfer vs. Fillet; Mirror; Rectangular and
+Circular Pattern with a parametric count; Extrude *Cut* through all; which
+bodies a cut touches (*targets*).
+|50–65 |teacher |*Expressions that design.* `floor((box_w - 2*wall - pitch) /
+pitch)` vents; clearance per side; `max(2*wall, 4 mm)`; unit mistakes and the
+error messages; the dependency graph of parameters (*Manage › Param Graph*);
+Section Analysis and Measure to check a wall.
+|65–125 |students |xref:_task_parametric_box_with_lid[Task: parametric box with lid] with checkpoints
+|125–135 |all |Compare boxes: what breaks when `wall` is 0.4 mm? When `box_h`
+is 5 mm? Discuss what the expressions should guard against.
+|===
+
+The teacher's object is again chosen by the students (a knob with a grip
+pattern, an enclosure for a specific board, a cup with a handle, a pen holder
+with a circular pattern of holes…), so every tool above is used on something
+other than the box.
+
+.Teacher's checklist of tools to show in this lesson
+****
+*Sketch:* New Sketch on a face, Project (kbd:[P]), Offset (kbd:[O]), Trim
+(kbd:[T]), Slot, Polygon, construction lines, Sketch Fillet.
+*Construct:* Offset Plane (parametric distance), Plane at Angle, Midplane.
+*Create:* Revolve, Extrude with *Cut* and *Through All* / *Symmetric*, Hole with
+edge distances, Rectangular Pattern, Circular Pattern, Mirror.
+*Modify:* Shell (which face to remove, thickness), Chamfer, Press Pull, Combine.
+*Inspect:* Section Analysis, Measure (kbd:[I]), Mass Center.
+*Manage:* Parameters, Param Graph (who uses what).
+*Bodies:* rename in the browser, hide/show with the eye, a feature's *targets*.
+****
+
+== 1. Sketching on faces and construction planes
+
+*New Sketch* accepts not only the three origin planes but any *flat face* of a
+body. Hover a face: it lights up; click it and the sketch lies on it. The face's
+edges are not part of the sketch, but *Project* (kbd:[P]) copies any edge, face
+outline, vertex or axis into it as linked geometry (it follows the model when it
+changes). Dimension your new curves against the projected ones.
+
+A face can disappear when an earlier feature changes (a fillet eats the edge, a
+shell removes the face). A *construction plane* does not. *Model › Construct ›
+Offset Plane* creates a plane parallel to an origin plane or a face at a
+distance, and the distance can be an expression: the lid in the task sits on an
+offset plane at `box_h + lid_gap`.
+
+video::offset-plane.mp4[width=720]
+
+.An offset plane at a parametric distance, with the lid's sketch and body on it
+image::offset-plane-dialog.png[width=800, link=../../../images/solidcraft/offset-plane-dialog.png]
+
+Sketch axes on the origin planes: on *XY*, sketch x and y are world X and Y. On
+*XZ* sketch x is world X and sketch y is world **−Z** (so a point at sketch
+`[0, -10]` is 10 mm up). On *YZ* sketch x is world Y and sketch y is world Z.
+When something extrudes the wrong way, this is usually why; the *Reverse* box in
+the dialog or a negative distance fixes it.
+
+== 2. More features
+
+[cols="1,3,2",options="header"]
+|===
+|Feature |What it does |When to prefer it
+
+|*Revolve* |turns a profile around an axis (a sketch line, an origin axis, an
+edge); angle 360° or less |anything round: knobs, bottles, pulleys, wheels. One
+sketch of half the cross-section instead of many circles.
+
+|*Shell* |hollows a body: pick the faces to open, set the wall thickness
+|boxes, cases, cups. Shell *after* the outer shape is final (including outer
+fillets), so the inside follows.
+
+|*Chamfer* |cuts an edge at 45° (or two distances) |the bottom edge of a print
+(elephant foot), lids that must slide on, anything that needs no support
+material. Fillet on the top, chamfer on the bottom.
+
+|*Mirror* |copies features or bodies across a plane |symmetric parts: model
+one half, mirror it. Changes to the half propagate.
+
+|*Rectangular / Circular Pattern* |repeats features, bodies or components with a
+count and spacing (or a count on a circle) |vents, holes, teeth, grips. The
+count can be an *expression*.
+
+|*Hole* |a drilled, counterbored or countersunk hole on a face, positioned by
+two edge distances, optionally with a thread |screw holes. Easier to edit than a
+circle in a sketch, and knows about M3/M4 sizes.
+
+|*Extrude Cut* |extrude with operation *Cut*; *Through All* reaches through
+every face in the way |slots, windows, text. The *targets* field chooses which
+bodies get cut when several overlap.
+
+|*Combine* |join, cut or intersect two bodies |a lid cut from the box body's
+shape, a mould from a part.
+|===
+
+video::shell.mp4[width=720]
+
+.Shell with the top face removed; the wall thickness is the parameter `wall`
+image::shell-dialog.png[width=800, link=../../../images/solidcraft/shell-dialog.png]
+
+video::pattern.mp4[width=720]
+
+.Rectangular pattern of the vent cut; quantity and spacing are expressions
+image::pattern-dialog.png[width=800, link=../../../images/solidcraft/pattern-dialog.png]
+
+.The vent slot: one sketch on the XZ plane, extruded symmetric through all, operation Cut, target the box body only
+image::vent-sketch-extrude.png[width=800, link=../../../images/solidcraft/vent-sketch-extrude.png]
+
+=== Several bodies in one design
+
+A design may hold any number of bodies; the browser's *Bodies* folder lists them.
+Extrude and Revolve offer *New Body* when the new material does not touch an
+existing body, *Join* when it does. A *Cut* asks which bodies it should cut
+(*Targets*); hidden bodies are never cut. Rename bodies in the browser
+(kbd:[F2]) as soon as you have two, and hide one with its eye when you work on
+the other.
+
+For a printed part made of two pieces (box and lid) this is enough. Components
+and joints, the assembly tools, are a short topic in lesson 3.
+
+== 3. Expressions that design
+
+Lesson 1 used parameters to *rename* numbers. Now the expressions do real work:
+
+[cols="2,3",options="header"]
+|===
+|Expression |Why
+
+|`vent_count = floor((box_w - 2 * wall - vent_pitch) / vent_pitch)`
+|as many vent slots as fit, leaving a wall at each end; `floor` makes it an
+integer, which a pattern count must be
+
+|`lid_inner = box_w + 2 * clearance`
+|a clearance *per side* is added twice
+
+|`corner_r = min(thickness, hole_inset / 2)`
+|a limit: a fillet larger than the material around it fails
+
+|`wall = max(2 * nozzle, 1.2 mm)`
+|a lower bound that depends on the printer
+
+|`angle / 2`, `90 deg - draft`
+|angles have their own unit; an angle where a length is expected is an error,
+not a silent conversion
+
+|`box_h - vent_margin`, `-(box_h - vent_margin)`
+|signs matter on the XZ plane (sketch y is −Z)
+|===
+
+Three rules that keep a design editable:
+
+. *One number, one place.* If `wall` appears in a sketch, an extrude and a shell,
+  there is exactly one parameter `wall` and three references to it.
+. *Derive, don't repeat.* `lid_h`, `vent_margin`, `pitch` are expressions of the
+  few numbers that really are decisions.
+. *Guard.* Any count or radius that can go to zero or below needs `max()`,
+  `min()` or a margin. The sweep tool in lesson 3 finds the rest.
+
+*Manage › Parameters › Param Graph* draws who uses what, which is the quickest
+way to find a dimension that still holds a plain number.
+
+== 4. Looking inside
+
+*Inspect › Section Analysis* cuts the view with a plane (XY, XZ, YZ or a
+construction plane, with an offset) and hatches the cut faces. Use it to check a
+wall thickness, a clearance between lid and box, a hidden hole. The cut is only
+in the view; the model is untouched. *Inspect › Measure* (kbd:[I]) with one or
+two selected items gives length, area, diameter, distance and angle.
+
+video::section.mp4[width=720]
+
+.Section through the finished box: lid wall, clearance, vents
+image::section-view.png[width=800, link=../../../images/solidcraft/section-view.png]
+
+[[_task_parametric_box_with_lid]]
+== Task: parametric box with lid
+
+A box with a sliding lid, ventilation slots in the long sides, printable without
+supports. Every size follows from `box_w`, `box_l`, `box_h`, `wall` and
+`clearance`.
+
+.Checkpoints
+[cols="1,3,2",options="header"]
+|===
+|Step |What is in it |File
+
+|1 |parameters `box_w`, `box_l`, `box_h`, `wall`; a centred rectangle with
+expression corners; extruded `box_h` into the body *Box*
+|link:../../../stls/solidcraft/box-01-body.sc[box-01-body.sc]
+
+|2 |Shell with the top face removed, thickness `wall`
+|link:../../../stls/solidcraft/box-02-shell.sc[box-02-shell.sc]
+
+|3 |`lid_h`, `clearance`, `lid_gap`; *Lid plane* offset `box_h + lid_gap`; the lid
+sketch `box_w/2 + wall + clearance` from the centre; extruded as a *new body*
+*Lid* and shelled from below
+|link:../../../stls/solidcraft/box-03-lid.sc[box-03-lid.sc]
+
+|4 |`vent_w`, `vent_pitch`, `vent_margin`, `vent_count`; one slot sketched on XZ,
+extruded symmetric through all as a *Cut* with target *Box*; a rectangular
+pattern of it with quantity `vent_count`
+|link:../../../stls/solidcraft/box-04-vents.sc[box-04-vents.sc]
+
+|5 |chamfer `wall / 2` on the lid's top edges, fillet `wall * 2` on the box's
+vertical edges
+|link:../../../stls/solidcraft/box-05-finished.sc[box-05-finished.sc]
+|===
+
+image::box-02-shell.png[width=300] image::box-03-lid.png[width=300] image::box-05-finished.png[width=300]
+
+=== Step 1 and 2: body and shell (10 min)
+
+. New design. *Parameters*: `box_w = 60`, `box_l = 40`, `box_h = 30`, `wall = 2`
+  (comment: "5 perimeters of 0.4 mm").
+. Sketch on XY, *Center Rectangle* from the origin; dimension the sides `box_w`
+  and `box_l` (type the names). Finish.
+. Extrude `box_h`. Rename the body to `Box` in the browser.
+. *Shell*: click the top face, thickness `wall`, OK. Section Analysis on XZ to
+  admire the wall.
+
+=== Step 3: the lid on a construction plane (15 min)
+
+. Parameters `lid_h = 8`, `clearance = 0.3` (comment: "gap per side"),
+  `lid_gap = 15` (comment: "viewing gap only, not printed").
+. *Offset Plane* from XY, distance `box_h + lid_gap`, name it `Lid plane`.
+. Sketch on *Lid plane*: a centred rectangle, half-sides
+  `box_w / 2 + wall + clearance` and `box_l / 2 + wall + clearance`. Finish.
+. Extrude `lid_h`, operation *New Body*. Rename the body `Lid`.
+. *Shell* the lid: remove its *bottom* face (the one facing the box), thickness
+  `wall`.
+. Check with Section Analysis that the lid's inner size is the box's outer size
+  plus `2 * clearance`.
+
+=== Step 4: vents that count themselves (20 min)
+
+. Parameters `vent_w = 2`, `vent_pitch = vent_w * 3`, `vent_margin = wall * 3`,
+  and `vent_count = floor((box_w - 2 * wall - vent_pitch) / vent_pitch)` with
+  unit *none*.
+. Sketch on *XZ*. A centred rectangle: centre at sketch `[0, -box_h / 2]`,
+  corner `[vent_w / 2, -(box_h - vent_margin)]`. Remember sketch y = −Z.
+  Finish.
+. Extrude: direction *Symmetric*, extent *Through All*, operation *Cut*,
+  targets: only *Box* (hide the lid first, or untick it). Rename the feature
+  `Vent`.
+. *Rectangular Pattern*: object type *Features*, pick `Vent`, direction X,
+  quantity `vent_count`, spacing `vent_pitch`, alignment *centre*.
+. Change `box_w` to 90 and to 35. The number of vents must change, and no vent
+  may cut the corner.
+
+=== Step 5: finishing (10 min)
+
+. *Chamfer* the four top edges of the lid, distance `wall / 2`.
+. *Fillet* the four vertical edges of the box, radius `wall * 2`. Note the order
+  problem: the shell was computed before the fillet, so the inside corners stay
+  sharp. Drag the fillet before the shell in the timeline (or edit the design so
+  the fillet comes first) and compare the sections.
+. Hide `Lid plane` and the sketches. Save. Export *3MF* (both bodies as separate
+  parts) and an STL of each body.
+
+=== Hand in
+
+`box.sc` with your own sizes, plus a screenshot of the section view showing the
+clearance. Bonus: a `clearance` that depends on a `printer` parameter (`0.2`
+for the Prusa, `0.3` for the Voron).
+
+== Common problems
+
+* *The lid sketch shows no profile.* The rectangle is not closed or lies on the
+  wrong plane. Check the browser: the sketch must be under *Lid plane*.
+* *The vent cut removed the lid too.* The cut's targets included both bodies.
+  Edit the feature and set targets to *Box*.
+* *Pattern count must be a number.* `vent_count` has a unit; set it to *none*,
+  or `floor()` is missing so the value is 8.33.
+* *Shell fails after fillet.* The fillet radius is smaller than the wall, so the
+  inner offset has no room. Use `wall * 2` or more.
+* *Section Analysis shows nothing.* The plane does not pass through the body; set
+  an offset, or pick XZ instead of YZ.

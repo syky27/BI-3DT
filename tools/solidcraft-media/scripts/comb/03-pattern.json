@@ -1,0 +1,4 @@
+{"commands": [
+  {"command": "solid.pattern.rectangular", "params": {"features": ["Slot"], "dir1": [1, 0, 0], "count1": "slot_count", "spacing1": "pitch", "alignment": "center", "name": "Slots"}},
+  {"command": "solid.fillet", "params": {"edges": [[40, 10, 7], [-40, 10, 7], [40, -10, 7], [-40, -10, 7]], "radius": "wall", "name": "Corners"}}
+]}

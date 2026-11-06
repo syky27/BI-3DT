@@ -1,0 +1,10 @@
+{"commands": [
+  {"command": "config.activate", "params": {"row": "S"}},
+  {"command": "file.export", "params": {"path": "media/ckpt/comb/comb-S.stl", "quality": "fine"}},
+  {"command": "config.activate", "params": {"row": "L"}},
+  {"command": "file.export", "params": {"path": "media/ckpt/comb/comb-L.stl", "quality": "fine"}},
+  {"command": "config.activate", "params": {"row": "M"}},
+  {"command": "file.export", "params": {"path": "media/ckpt/comb/comb-M.stl", "quality": "fine"}},
+  {"command": "file.export", "params": {"path": "media/ckpt/comb/comb-M.step"}},
+  {"command": "file.export", "params": {"path": "media/ckpt/comb/comb-M.3mf"}}
+]}

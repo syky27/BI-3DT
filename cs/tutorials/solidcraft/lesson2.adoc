@@ -1,0 +1,299 @@
+= SolidCraft 2: Operace, plochy a výrazy
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+.Po této lekci umíte
+* skicovat na ploše tělesa a na *konstrukční rovině*,
+* používat *Revolve*, *Shell*, *Chamfer*, *Mirror* a *Pattern* a vědět, kdy je
+  který lepší nástroj,
+* držet v jednom návrhu více *těles* a řezat jedno operací, aniž byste se
+  dotkli druhého,
+* psát výrazy, které návrh *počítají*: počty přes `floor()`, meze přes
+  `min()`/`max()`, vůle, jednotky,
+* číst vnitřek dílu pomocí *Section Analysis* a měřit ho.
+
+== Rozvrh (135 min)
+
+[cols="1,1,5",options="header"]
+|===
+|Min |Kdo |Co
+
+|0–10 |cvičící |Destičky z úkolu na plátně: otevřít dvě, změnit `width`,
+podívat se, co přežilo. Opakování vazeb a parametrů.
+|10–30 |cvičící |*Skicování na plochách a rovinách.* New Sketch na ploše
+tělesa; *Project* (kbd:[P]) přenese hrany do skici; *Offset Plane*
+v parametrické vzdálenosti; skicování na ní; proč je rovina počátku nebo
+konstrukční rovina stabilnější reference než plocha.
+|30–50 |cvičící |*Další operace.* Revolve (knoflík, láhev); Shell (otevření
+krabičky, tloušťka stěny jako parametr); Chamfer vs. Fillet; Mirror;
+Rectangular a Circular Pattern s parametrickým počtem; Extrude *Cut* through
+all; kterých těles se řez dotkne (*targets*).
+|50–65 |cvičící |*Výrazy, které navrhují.* `floor((box_w - 2*wall - pitch) /
+pitch)` průduchů; vůle na stranu; `max(2*wall, 4 mm)`; chyby jednotek a jejich
+hlášky; graf závislostí parametrů (*Manage › Param Graph*); Section Analysis
+a Measure pro kontrolu stěny.
+|65–125 |studenti |xref:_uloha_parametricka_krabicka_s_vikem[Úloha: parametrická krabička s víkem] s checkpointy
+|125–135 |všichni |Porovnání krabiček: co se rozbije při `wall` 0,4 mm? Při
+`box_h` 5 mm? Diskuse, před čím mají výrazy chránit.
+|===
+
+Objekt cvičícího opět volí studenti (knoflík s rýhováním, krabička na konkrétní
+desku, hrnek s uchem, stojánek na tužky s kruhovým polem otvorů…), takže každý
+nástroj výše se použije na něčem jiném než na krabičce.
+
+.Seznam nástrojů, které má cvičící v této lekci ukázat
+****
+*Skica:* New Sketch na ploše, Project (kbd:[P]), Offset (kbd:[O]), Trim
+(kbd:[T]), Slot, Polygon, konstrukční čáry, Sketch Fillet.
+*Construct:* Offset Plane (parametrická vzdálenost), Plane at Angle, Midplane.
+*Create:* Revolve, Extrude s *Cut* a *Through All* / *Symmetric*, Hole se
+vzdálenostmi od hran, Rectangular Pattern, Circular Pattern, Mirror.
+*Modify:* Shell (kterou plochu odebrat, tloušťka), Chamfer, Press Pull, Combine.
+*Inspect:* Section Analysis, Measure (kbd:[I]), Mass Center.
+*Manage:* Parameters, Param Graph (kdo co používá).
+*Tělesa:* přejmenování v browseru, skrytí okem, *targets* operace.
+****
+
+== 1. Skicování na plochách a konstrukčních rovinách
+
+*New Sketch* přijme nejen tři roviny počátku, ale i kteroukoli *rovnou plochu*
+tělesa. Najeďte na plochu: rozsvítí se; klikněte a skica leží na ní. Hrany
+plochy nejsou součástí skici, ale *Project* (kbd:[P]) zkopíruje kteroukoli
+hranu, obrys plochy, vrchol nebo osu do skici jako provázanou geometrii (při
+změně modelu ji následuje). Nové křivky kótujte vůči promítnutým.
+
+Plocha může zmizet, když se změní dřívější operace (zaoblení sežere hranu,
+skořepina odstraní plochu). *Konstrukční rovina* ne. *Model › Construct ›
+Offset Plane* vytvoří rovinu rovnoběžnou s rovinou počátku nebo plochou ve
+vzdálenosti, která může být výraz: víko v úloze sedí na odsazené rovině
+`box_h + lid_gap`.
+
+video::offset-plane.mp4[width=720]
+
+.Odsazená rovina v parametrické vzdálenosti se skicou a tělesem víka
+image::offset-plane-dialog.png[width=800, link=../../../images/solidcraft/offset-plane-dialog.png]
+
+Osy skici na rovinách počátku: na *XY* jsou x a y skici světové X a Y. Na *XZ*
+je x skici světové X a y skici světové **−Z** (takže bod skici `[0, -10]` je
+10 mm nahoru). Na *YZ* je x skici světové Y a y skici světové Z. Když něco
+vytáhne na špatnou stranu, je to obvykle tohle; zaškrtávátko *Reverse*
+v dialogu nebo záporná vzdálenost to spraví.
+
+== 2. Další operace
+
+[cols="1,3,2",options="header"]
+|===
+|Operace |Co dělá |Kdy ji preferovat
+
+|*Revolve* |otočí profil kolem osy (čára skici, osa počátku, hrana); úhel 360°
+nebo menší |cokoli kulatého: knoflíky, láhve, řemenice, kola. Jedna skica
+poloviny průřezu místo mnoha kružnic.
+
+|*Shell* |vydlabe těleso: vyberete plochy k otevření, nastavíte tloušťku stěny
+|krabičky, kryty, hrnky. Shell *až po* dokončení vnějšího tvaru (včetně
+vnějších zaoblení), aby vnitřek následoval.
+
+|*Chamfer* |srazí hranu pod 45° (nebo dvě vzdálenosti) |spodní hrana tisku
+(sloní noha), víka, která musí nasunout, cokoli bez podpěr. Fillet nahoře,
+chamfer dole.
+
+|*Mirror* |zkopíruje operace nebo tělesa přes rovinu |symetrické díly:
+vymodelujte půlku, zrcadlete. Změny půlky se propagují.
+
+|*Rectangular / Circular Pattern* |opakuje operace, tělesa nebo komponenty
+s počtem a roztečí (nebo počtem na kružnici) |průduchy, otvory, zuby, rýhy.
+Počet může být *výraz*.
+
+|*Hole* |vrtaný, zahloubený nebo kuželově zahloubený otvor na ploše, umístěný
+dvěma vzdálenostmi od hran, volitelně se závitem |otvory pro šrouby. Snáze se
+upravuje než kružnice ve skice a zná velikosti M3/M4.
+
+|*Extrude Cut* |vytažení s operací *Cut*; *Through All* projde všemi plochami
+v cestě |drážky, okna, text. Pole *targets* volí, která tělesa se řežou, když
+se překrývá víc těles.
+
+|*Combine* |spojí, odečte nebo protne dvě tělesa |víko vyříznuté z tvaru
+krabičky, forma z dílu.
+|===
+
+video::shell.mp4[width=720]
+
+.Shell s odebranou horní plochou; tloušťka stěny je parametr `wall`
+image::shell-dialog.png[width=800, link=../../../images/solidcraft/shell-dialog.png]
+
+video::pattern.mp4[width=720]
+
+.Obdélníkové pole řezu průduchu; počet i rozteč jsou výrazy
+image::pattern-dialog.png[width=800, link=../../../images/solidcraft/pattern-dialog.png]
+
+.Drážka průduchu: jedna skica na rovině XZ, vytažená symetricky skrz vše, operace Cut, cíl pouze těleso krabičky
+image::vent-sketch-extrude.png[width=800, link=../../../images/solidcraft/vent-sketch-extrude.png]
+
+=== Více těles v jednom návrhu
+
+Návrh může obsahovat libovolný počet těles; složka *Bodies* v browseru je
+vypisuje. Extrude a Revolve nabídnou *New Body*, když se nový materiál
+nedotýká existujícího tělesa, *Join*, když ano. *Cut* se ptá, která tělesa má
+řezat (*Targets*); skrytá tělesa se neřežou nikdy. Jakmile máte dvě tělesa,
+přejmenujte je v browseru (kbd:[F2]) a při práci na jednom skryjte druhé okem.
+
+Pro tištěný díl ze dvou kusů (krabička a víko) to stačí. Komponenty a klouby,
+nástroje pro sestavy, jsou krátké téma 3. lekce.
+
+== 3. Výrazy, které navrhují
+
+V 1. lekci parametry čísla jen *přejmenovaly*. Teď výrazy dělají skutečnou
+práci:
+
+[cols="2,3",options="header"]
+|===
+|Výraz |Proč
+
+|`vent_count = floor((box_w - 2 * wall - vent_pitch) / vent_pitch)`
+|tolik průduchů, kolik se vejde, s kouskem stěny na každém konci; `floor` z toho
+udělá celé číslo, což počet v poli musí být
+
+|`lid_inner = box_w + 2 * clearance`
+|vůle *na stranu* se přičítá dvakrát
+
+|`corner_r = min(thickness, hole_inset / 2)`
+|mez: zaoblení větší než materiál kolem selže
+
+|`wall = max(2 * nozzle, 1.2 mm)`
+|dolní mez závislá na tiskárně
+
+|`angle / 2`, `90 deg - draft`
+|úhly mají vlastní jednotku; úhel tam, kde se čeká délka, je chyba, ne tichý
+převod
+
+|`box_h - vent_margin`, `-(box_h - vent_margin)`
+|na rovině XZ záleží na znaménku (y skici je −Z)
+|===
+
+Tři pravidla, která drží návrh upravitelný:
+
+. *Jedno číslo, jedno místo.* Pokud se `wall` objeví ve skice, vytažení
+  a skořepině, existuje přesně jeden parametr `wall` a tři odkazy na něj.
+. *Odvozujte, neopakujte.* `lid_h`, `vent_margin`, `pitch` jsou výrazy z těch
+  pár čísel, která jsou skutečně rozhodnutí.
+. *Hlídejte.* Každý počet nebo poloměr, který může klesnout na nulu nebo pod
+  ni, potřebuje `max()`, `min()` nebo rezervu. Zbytek najde sweep ve 3. lekci.
+
+*Manage › Parameters › Param Graph* nakreslí, kdo co používá, což je nejrychlejší
+způsob, jak najít kótu, která pořád drží holé číslo.
+
+== 4. Pohled dovnitř
+
+*Inspect › Section Analysis* rozřízne pohled rovinou (XY, XZ, YZ nebo
+konstrukční rovina, s odsazením) a řezné plochy vyšrafuje. Použijte ho na
+kontrolu tloušťky stěny, vůle mezi víkem a krabičkou, skrytého otvoru. Řez je
+jen v pohledu; model zůstává. *Inspect › Measure* (kbd:[I]) s jednou nebo dvěma
+vybranými položkami dá délku, plochu, průměr, vzdálenost a úhel.
+
+video::section.mp4[width=720]
+
+.Řez hotovou krabičkou: stěna víka, vůle, průduchy
+image::section-view.png[width=800, link=../../../images/solidcraft/section-view.png]
+
+[[_uloha_parametricka_krabicka_s_vikem]]
+== Úloha: parametrická krabička s víkem
+
+Krabička s nasouvacím víkem, větracími drážkami v dlouhých stranách,
+tisknutelná bez podpěr. Každý rozměr vychází z `box_w`, `box_l`, `box_h`,
+`wall` a `clearance`.
+
+.Checkpointy
+[cols="1,3,2",options="header"]
+|===
+|Krok |Co obsahuje |Soubor
+
+|1 |parametry `box_w`, `box_l`, `box_h`, `wall`; středový obdélník s rohy
+z výrazů; vytaženo `box_h` do tělesa *Box*
+|link:../../../stls/solidcraft/box-01-body.sc[box-01-body.sc]
+
+|2 |Shell s odebranou horní plochou, tloušťka `wall`
+|link:../../../stls/solidcraft/box-02-shell.sc[box-02-shell.sc]
+
+|3 |`lid_h`, `clearance`, `lid_gap`; *Lid plane* odsazená o `box_h + lid_gap`;
+skica víka `box_w/2 + wall + clearance` od středu; vytaženo jako *nové těleso*
+*Lid* a vydlabáno zespodu
+|link:../../../stls/solidcraft/box-03-lid.sc[box-03-lid.sc]
+
+|4 |`vent_w`, `vent_pitch`, `vent_margin`, `vent_count`; jedna drážka
+naskicovaná na XZ, vytažená symetricky skrz vše jako *Cut* s cílem *Box*;
+obdélníkové pole s počtem `vent_count`
+|link:../../../stls/solidcraft/box-04-vents.sc[box-04-vents.sc]
+
+|5 |zkosení `wall / 2` horních hran víka, zaoblení `wall * 2` svislých hran
+krabičky
+|link:../../../stls/solidcraft/box-05-finished.sc[box-05-finished.sc]
+|===
+
+image::box-02-shell.png[width=300] image::box-03-lid.png[width=300] image::box-05-finished.png[width=300]
+
+=== Krok 1 a 2: tělo a skořepina (10 min)
+
+. Nový návrh. *Parameters*: `box_w = 60`, `box_l = 40`, `box_h = 30`,
+  `wall = 2` (komentář: "5 perimetrů po 0,4 mm").
+. Skica na XY, *Center Rectangle* z počátku; strany okótujte `box_w`
+  a `box_l` (napište jména). Finish.
+. Extrude `box_h`. Těleso v browseru přejmenujte na `Box`.
+. *Shell*: klik na horní plochu, tloušťka `wall`, OK. Section Analysis na XZ
+  pro obdiv stěny.
+
+=== Krok 3: víko na konstrukční rovině (15 min)
+
+. Parametry `lid_h = 8`, `clearance = 0.3` (komentář: "vůle na stranu"),
+  `lid_gap = 15` (komentář: "jen mezera pro zobrazení, netiskne se").
+. *Offset Plane* od XY, vzdálenost `box_h + lid_gap`, pojmenujte `Lid plane`.
+. Skica na *Lid plane*: středový obdélník, poloviny stran
+  `box_w / 2 + wall + clearance` a `box_l / 2 + wall + clearance`. Finish.
+. Extrude `lid_h`, operace *New Body*. Těleso přejmenujte na `Lid`.
+. *Shell* víka: odeberte jeho *spodní* plochu (tu směrem ke krabičce),
+  tloušťka `wall`.
+. Section Analysis ověří, že vnitřní rozměr víka je vnější rozměr krabičky
+  plus `2 * clearance`.
+
+=== Krok 4: průduchy, které se samy spočítají (20 min)
+
+. Parametry `vent_w = 2`, `vent_pitch = vent_w * 3`, `vent_margin = wall * 3`
+  a `vent_count = floor((box_w - 2 * wall - vent_pitch) / vent_pitch)`
+  s jednotkou *none*.
+. Skica na *XZ*. Středový obdélník: střed ve skice `[0, -box_h / 2]`, roh
+  `[vent_w / 2, -(box_h - vent_margin)]`. Pamatujte, y skici = −Z. Finish.
+. Extrude: směr *Symmetric*, rozsah *Through All*, operace *Cut*, targets:
+  pouze *Box* (nejdřív skryjte víko nebo ho odškrtněte). Operaci přejmenujte
+  na `Vent`.
+. *Rectangular Pattern*: typ objektu *Features*, vyberte `Vent`, směr X,
+  počet `vent_count`, rozteč `vent_pitch`, zarovnání *center*.
+. Změňte `box_w` na 90 a na 35. Počet průduchů se musí změnit a žádný
+  průduch nesmí řezat roh.
+
+=== Krok 5: dokončení (10 min)
+
+. *Chamfer* čtyř horních hran víka, vzdálenost `wall / 2`.
+. *Fillet* čtyř svislých hran krabičky, poloměr `wall * 2`. Všimněte si
+  problému s pořadím: skořepina se spočítala před zaoblením, takže vnitřní rohy
+  zůstaly ostré. Přetáhněte zaoblení v časové ose před skořepinu (nebo návrh
+  upravte tak, aby zaoblení bylo dřív) a porovnejte řezy.
+. Skryjte `Lid plane` a skici. Uložte. Exportujte *3MF* (obě tělesa jako
+  samostatné díly) a STL každého tělesa.
+
+=== Odevzdání
+
+`box.sc` s vlastními rozměry plus snímek řezu ukazující vůli. Bonus:
+`clearance` závislá na parametru `printer` (`0.2` pro Prusu, `0.3` pro Voron).
+
+== Časté problémy
+
+* *Skica víka nemá žádný profil.* Obdélník není uzavřený nebo leží na špatné
+  rovině. Zkontrolujte browser: skica musí být pod *Lid plane*.
+* *Řez průduchu odstranil i víko.* Cíle řezu zahrnovaly obě tělesa. Upravte
+  operaci a nastavte targets na *Box*.
+* *Počet v poli musí být číslo.* `vent_count` má jednotku; nastavte *none*,
+  nebo chybí `floor()`, takže hodnota je 8,33.
+* *Shell selže po zaoblení.* Poloměr zaoblení je menší než stěna, takže vnitřní
+  odsazení nemá místo. Použijte `wall * 2` nebo víc.
+* *Section Analysis nic neukáže.* Rovina neprochází tělesem; nastavte odsazení
+  nebo vyberte XZ místo YZ.

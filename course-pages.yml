@@ -15,6 +15,7 @@ navigation:
     - README.*
     - LICENSE
     - tutorials/openscad/
+    - tutorials/solidcraft/
     - archive/media/
 excludedFiles:
   - _build

@@ -3,6 +3,7 @@
 If you want to use your own computer at home or during exercises, you will necessarily need these programs:
 
 * http://openscad.org[OpenSCAD] 2019.05 or newer
+* https://solidcraft.io[SolidCraft] 0.30 or newer (xref:tutorials/solidcraft/install#[installation guide])
 * https://github.com/3DprintFIT/netfabb-basic-download/releases[netfabb Basic]
 * https://github.com/SoftFever/OrcaSlicer[OrcaSlicer]
 * https://github.com/admesh/admesh[ADMesh] >= 0.98 (including devel packages, if installing from repositories)

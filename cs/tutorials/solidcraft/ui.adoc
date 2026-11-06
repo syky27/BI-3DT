@@ -1,0 +1,178 @@
+= SolidCraft: Co je kde
+:toc:
+:imagesdir: ../../../images/solidcraft/
+:experimental:
+
+Deset minut s touto stránkou před 1. lekcí a okno už pro vás nebude cizí.
+Všechny snímky jsou ze SolidCraftu 0.30.1 s výchozím tmavým motivem
+(Preferences › Appearance má i světlý).
+
+== Okno
+
+.Okno SolidCraftu s otevřeným návrhem
+image::window-callouts.png[width=900, link=../../../images/solidcraft/window-callouts.png]
+
+. *Titulkový pruh* — nabídka *File* (New, Open, Save, Save As, Export…),
+  zpět/vpřed, tlačítko domů (úvodní stránka) a záložka pro každý otevřený
+  návrh. Tečka za jménem značí neuložené změny. Vpravo: Report a bug,
+  Preferences (ozubené kolo), Help.
+. *Panel nástrojů* — záložky *Model*, *Surface*, *Assemble*, *Insert*,
+  *Inspect*, *Manage*, *View*… Každá záložka je rozdělená na panely (Sketch,
+  Create, Modify, Arrange, Configure, Construct). Kliknutím na název panelu
+  získáte všechny jeho příkazy. Při úpravě skici se objeví zelená záložka
+  *Sketch* a převezme vedení.
+. *Browser* — návrh jako strom: nastavení dokumentu a jednotky, pojmenované
+  pohledy, *Origin* se třemi rovinami XY, XZ, YZ (také Top, Front, Right),
+  *Bodies* (tělesa), *Sketches* (skici), konstrukční roviny, *Features*
+  (operace). Oko položku skryje nebo ukáže; pravé tlačítko dá její nabídku.
+. *Viewport* — model. Levé tlačítko vybírá, Shift přidává do výběru, opakované
+  kliknutí na stejné místo cyklí tím, co je pod kurzorem.
+. *Osový kříž* — kliknutím na osu se podíváte podél ní, domeček vrátí výchozí
+  pohled.
+. *Navigační lišta* — otáčení, posun, zoom, fit, look at, domů, styl
+  zobrazení, nastavení zobrazení (mřížka, stíny).
+. *History* — časová osa: jedna ikona na operaci v pořadí, v jakém se
+  počítají. Dvojklik ikonu upraví, přetažením značky na konci zpět v čase
+  uvidíte, jak návrh vypadal, pravé tlačítko nabídne potlačení, přejmenování,
+  smazání.
+. *Hledání příkazů* — kbd:[S]. Napište začátek jakéhokoli příkazu (např.
+  `fillet`) a spusťte ho bez hledání tlačítka.
+
+== Pohyb v modelu
+
+[cols="1,2",options="header"]
+|===
+|Akce |Jak
+
+|Otáčení |tažení *pravým* tlačítkem (Shift přichytí k nejbližšímu standardnímu pohledu)
+|Posun |tažení *prostředním* tlačítkem (stisknuté kolečko)
+|Zoom |kolečko myši, zoomuje k ukazateli
+|Vejít vše do pohledu |kbd:[F6] nebo ikona rámečku v navigační liště
+|Standardní pohledy |kbd:[Ctrl+1] zepředu, kbd:[Ctrl+5] shora, kbd:[Ctrl+7] izometrie… nebo klik na osový kříž
+|Pohled kolmo na plochu, rovinu nebo skicu |vyberte ji a stiskněte kbd:[Ctrl+8]
+|Domů |dvojklik prostředním tlačítkem nebo domeček nad osovým křížem
+|Trackpad |pinch zoomuje, dva prsty posouvají; Preferences › Navigation má preset *Touchpad*, kde Shift+pohyb posouvá a Alt+pohyb otáčí bez tlačítka
+|===
+
+Pokud přicházíte z Fusionu, SolidWorksu, Inventoru, Blenderu nebo OpenSCADu,
+Preferences › Navigation › Mouse preset přepne na mapování myši daného
+programu.
+
+.Pohled zepředu a shora na tutéž destičku (kbd:[Ctrl+1], kbd:[Ctrl+5])
+image::view-front.png[width=440, link=../../../images/solidcraft/view-front.png] image::view-top.png[width=440, link=../../../images/solidcraft/view-top.png]
+
+== Režim skici
+
+.Úprava skici: záložka Sketch, paleta skici a kóty
+image::sketch-mode.png[width=900, link=../../../images/solidcraft/sketch-mode.png]
+
+Když je skica otevřená:
+
+* zelená záložka *Sketch* obsahuje kreslicí nástroje (Line, Rectangle, Circle,
+  Arc, Polygon, Slot, Text), úpravy (Trim, Offset, Fillet, Mirror, Pattern),
+  *Dimension* a tlačítka vazeb (horizontal/vertical, coincident, tangent,
+  equal, parallel, perpendicular, symmetry…), *Project* pro přenesení hran
+  modelu do skici a *Finish Sketch*;
+* *paleta skici* vpravo ukazuje stav skici. "*Fully constrained*" znamená, že
+  už se nic nemůže hnout; do té doby říká, kolik stupňů volnosti zbývá.
+  Nedourčené křivky jsou *modré*, plně určené *bílé*;
+* malé čtvercové ikony na křivkách jsou *vazby*. Najetím zjistíte, co dělá,
+  kliknutím a kbd:[Delete] ji odstraníte;
+* čísla jsou *kóty*. Dvojklikem změníte hodnotu a hodnota může být výraz
+  (`width / 2`) nebo jméno parametru.
+
+Nejužitečnější klávesy: kbd:[L] úsečka, kbd:[R] obdélník, kbd:[C] kružnice,
+kbd:[D] kóta, kbd:[X] přepnutí konstrukční geometrie, kbd:[T] ořez, kbd:[O]
+odsazení, kbd:[P] promítnutí, kbd:[Esc] zruší nástroj.
+
+== Dialogy
+
+Každá operace otevře dialog vpravo. První řádek bývá *výběr* (profily, plochy,
+hrany): vyplníte ho kliknutím ve viewportu. Číselná pole přijímají výrazy
+a jména parametrů. Enter je totéž co OK, Esc ruší. Červený text dole znamená,
+že operaci s těmito vstupy nelze postavit, a vysvětluje proč.
+
+.Dialog Extrude, zde při úpravě existující operace, jejíž vzdálenost je parametr `thickness`
+image::extrude-dialog.png[width=900, link=../../../images/solidcraft/extrude-dialog.png]
+
+[[files]]
+== Soubory
+
+=== Soubor návrhu `.sc`
+
+Návrh se ukládá jako jeden soubor s příponou `.sc`. Je to archiv ZIP, takže se
+dovnitř podíváte pomocí `unzip -l`:
+
+----
+$ unzip -l plate-04-parametric.sc
+  Length      Name
+  ---------   ----
+         37   container.json      <1>
+      13877   document.json       <2>
+----
+<1> říká, o který formát kontejneru jde (`solidcraft-container/1`)
+<2> celý parametrický dokument: jednotky, uživatelské parametry, každá skica
+    s křivkami, vazbami a kótami, každá operace se vstupy, tabulka konfigurací,
+    pojmenované pohledy, vzhledy
+
+Importované STEP soubory, sítě a obrázky leží vedle ve složce `blobs/`,
+pojmenované podle hashe SHA-256, takže návrh, který importuje 50MB sken, se
+neotvírá pomalu. Co v souboru *není*, je spočítaná geometrie: SolidCraft
+tělesa při otevření znovu postaví z časové osy (u velkých návrhů lze uložit
+i cache výsledku, aby se otevíraly rychleji).
+
+Dobré vědět:
+
+* *Save As › JSON* zapíše tentýž dokument jako čitelný `document.json` bez
+  ZIPu. Hodí se na diffy v Gitu a na prozkoumání, co si operace ukládá. Otevře
+  se jako kterýkoli jiný návrh.
+* Starší verze neotevřou soubory uložené novějšími. Držte ve třídě stejnou
+  verzi a před aktualizací si udělejte kopii.
+* SolidCraft každých pár minut automaticky ukládá neuložené změny do složky
+  pro obnovu a po pádu je nabídne. Při každém uložení nechá vedle souboru
+  i `.bak`.
+* Jeden soubor návrhu obsahuje jedno nebo více těles a může obsahovat
+  komponenty (díly umístěné v sestavě). Pro tento předmět platí jeden soubor
+  = jeden díl.
+* Soubory `.solidcraft` z prvních verzí se stále otevřou.
+
+=== Nabídka File
+
+.Nabídka File: otevřít, vložit, uložit, exportovat
+image::file-menu.png[width=400, link=../../../images/solidcraft/file-menu.png]
+
+[cols="1,2,1",options="header"]
+|===
+|Formát |Použití |Směr
+
+|`.sc` / `.json` |samotný návrh, upravitelný, to, co odevzdáváte |uložit, otevřít
+|STL |síť pro slicer (u kulatých dílů volte kvalitu *fine*) |export, import (jako síťové těleso)
+|3MF |síť pro slicer s barvami a více tělesy jako díly |export, import
+|STEP |přesná tělesa pro jiné CAD programy |export, import
+|OBJ, glTF |sítě s materiály, pro Blender a web |export / import
+|DXF, SVG |2D obrysy pro laser; skica je umí importovat |export, import do skici
+|PNG |render pohledu (*Inspect › Render* nebo `solidcraft-cli snapshot`) |export
+|===
+
+NOTE: Síť (STL, 3MF) importovaná do SolidCraftu je *síťové těleso*: zobrazí
+se, měří a exportuje, ale operace ze skic ho neumí řezat ani spojovat.
+Uchovávejte `.sc` všeho, co budete chtít měnit.
+
+=== Co odevzdávat
+
+K úlohám ze cvičení i k úkolu odevzdávejte vždy *návrh `.sc`*, ne jen STL.
+Návrh je to, co hodnotíme: otevřeme ho, změníme parametr a čekáme, že se díl
+přestaví. STL to neumí.
+
+== Nastavení a nápověda
+
+* Preferences (ozubené kolo v titulku): motiv, jednotky nových návrhů, preset
+  myši, co se stane po ukončení skici, kvalita grafiky.
+* *Help › Keyboard Shortcuts* vypíše všechny zkratky; *File › Keyboard
+  Shortcuts* je mění.
+* *Help › Documentation* otevře manuál https://docs.solidcraft.io/.
+* *Report a bug* připraví GitHub issue s diagnostikou; nic se neodešle, dokud ho
+  sami nezveřejníte.
+
+.Preferences
+image::preferences.png[width=700, link=../../../images/solidcraft/preferences.png]

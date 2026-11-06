@@ -1,0 +1,152 @@
+= SolidCraft: Parametric CAD with sketches
+:toc:
+:imagesdir: ../../images/solidcraft/
+
+https://solidcraft.io[SolidCraft] is a free, open-source, parametric 3D CAD program.
+In BI-3DT it replaces Fusion 360 as the "click-and-sketch" counterpart to
+xref:openscad#[OpenSCAD]: where OpenSCAD describes a model in code, SolidCraft
+builds it from 2D *sketches* that you turn into solids with *features* (extrude,
+revolve, shell, fillet, pattern…). Both are parametric: change a number and the
+whole model rebuilds.
+
+.A parametric plate: the same design with other parameter values
+image::plate-04-parametric.png[width=400] image::plate-05-variant.png[width=400]
+
+== Three lessons
+
+Each lesson is 135 minutes. In the first half the teacher models live and shows
+the tools; in the second half you build your own model from the step-by-step
+task and the downloadable checkpoints. The teacher's object is deliberately
+different from yours (students pick it at the start of the lesson), so you see
+the *tools* used in another context rather than a recipe to copy.
+
+[cols="1,3,4,1",options="header"]
+|===
+|Lesson |Topic |You will learn |Points
+
+|xref:solidcraft/lesson1#[1]
+|From sketch to solid
+|the window, navigation, sketches, constraints and dimensions, extrude, fillet,
+the timeline, your first user parameters, saving `.sc` and exporting STL
+|3
+
+|xref:solidcraft/lesson2#[2]
+|Features, faces and expressions
+|sketching on faces, construction planes, revolve, shell, chamfer, patterns,
+mirror, section analysis, expressions with units and functions
+|3
+
+|xref:solidcraft/lesson3#[3]
+|Designing for change
+|parameter hygiene, configurations (S/M/L of one design), parameter sweep,
+multiple bodies, export for printing, the command line and scripts
+|3
+|===
+
+Before lesson 1:
+
+* xref:solidcraft/install#[Install SolidCraft] on your laptop (packages exist for
+  Linux, macOS and Windows) and bring the laptop and a mouse 🖱️.
+* Read xref:solidcraft/ui#[What is where] so the window is not new to you.
+
+== What SolidCraft is
+
+SolidCraft is a *history-based parametric modeller* written in Rust by
+https://github.com/tangency-labs/solidcraft[Tangency Labs] and contributors,
+licensed MIT or Apache-2.0. It runs as a desktop app on Linux, macOS, Windows and
+FreeBSD, in the browser (https://solidcraft.io/app), and headless as a
+command-line tool (`solidcraft-cli`). All three run the same *commands*: every
+button you click is a command with named parameters, and the same command can
+come from a script, from the CLI or from an AI agent through the built-in MCP
+server.
+
+The modelling idea in one paragraph: a *design* holds a *timeline* of
+*features*. A part usually starts with a *sketch* (a 2D drawing on a plane, held
+in shape by *constraints* and *dimensions*). A feature such as Extrude or Revolve
+turns the sketch's closed regions into a solid *body*; later features add to it,
+cut into it or finish it. Every dimension and feature input is a *parameter*, so
+any size can be changed later and the timeline rebuilds from the first feature
+that uses it.
+
+----
+sketch (plane + constraints + dimensions)
+   └─ feature (extrude, revolve, …)  →  body
+         └─ more features (holes, fillets, patterns, shell, …)
+               └─ change a parameter  →  the timeline rebuilds
+----
+
+=== A little history
+
+* The project appeared on GitHub in *October 2026* (first tagged release 0.1.0 on
+  9 October 2026) under the account of its original author, `bherbruck`, and moved
+  to the Tangency Labs organisation shortly after. The name SolidCraft is used
+  since version 0.5; earlier builds had a different working name, which is why
+  old `.solidcraft` files and a few `solvecraft` identifiers still show up.
+* It is a *clean-room* rewrite of the classic sketch-and-feature CAD workflow
+  that Fusion 360, Onshape, SolidWorks and FreeCAD share. Its geometry kernel,
+  https://github.com/tangency-labs/solidcore[SolidCore], is a Rust port of the
+  SMLib B-rep library.
+* Releases ship almost daily and the version numbers climb fast (0.30.1 at the
+  time of writing, November 2026). Expect occasional rough edges: a feature that
+  refuses an unusual fillet, a dialog that moved since the screenshot was taken.
+  The project tracks its own status in its
+  https://github.com/tangency-labs/solidcraft/blob/main/ROADMAP.md[roadmap] and
+  reference tests.
+
+=== Why we switched from Fusion 360
+
+* *No registration, no licence, no cloud.* Fusion needed an Autodesk education
+  account and kept your files on their servers. SolidCraft is a program on your
+  disk; your designs are files you own and can commit to Git.
+* *Open source.* You can read how a fillet is computed, report or fix a bug, and
+  the lab can patch what the course needs.
+* *Scriptable.* The same model can be built from a JSON script or rebuilt into one
+  (`solidcraft-cli script`). That connects the GUI world of this course with the
+  code world of OpenSCAD, and makes homework reproducible.
+* *Light.* A single binary, works offline, runs on Linux.
+
+What you lose compared with Fusion: assemblies and simulation are young, there is
+no CAM, and the program is one month old. For modelling printable parts with
+sketches, which is all this course needs, it is already enough.
+
+== How you can use it
+
+[cols="1,3",options="header"]
+|===
+|Use |How
+
+|Desktop app
+|The way we work in the lessons. `solidcraft design.sc` opens a design,
+`solidcraft part.step` imports a STEP/STL/3MF/OBJ file as a new design.
+
+|Browser
+|https://solidcraft.io/app — the same program compiled to WebAssembly. Designs
+live in the browser's private storage; download a copy to keep it.
+
+|Command line
+|`solidcraft-cli run script.json --out part.stl` builds a part without a window;
+`solidcraft-cli snapshot design.sc --out picture.png` renders it;
+`solidcraft-cli eval design.sc` prints volume, area and centre of mass. Lesson 3.
+
+|AI agents
+|`solidcraft-cli mcp` starts an MCP server, so an agent such as Claude Code can
+sketch, measure and export in your design. Not part of the course, but worth
+knowing it exists.
+|===
+
+Import: STEP, IGES, 3MF, STL, OBJ, glTF, FreeCAD and Rhino files. Export: STEP,
+IGES, STL, 3MF, OBJ, URDF, DXF, PNG renders. The native format is `.sc`
+(xref:solidcraft/ui#files[explained here]).
+
+== Materials
+
+* xref:solidcraft/install#[Installation] (Linux packages, Homebrew, winget)
+* xref:solidcraft/ui#[What is where: the window, navigation and files]
+* xref:solidcraft/lesson1#[Lesson 1: From sketch to solid]
+* xref:solidcraft/lesson2#[Lesson 2: Features, faces and expressions]
+* xref:solidcraft/lesson3#[Lesson 3: Designing for change]
+* Official manual: https://docs.solidcraft.io/ (the *Guide* half, the *Developer*
+  half is for contributors)
+* Every checkpoint of every lesson is a `.sc` file in the `stls/solidcraft/`
+  folder of this repository, and every checkpoint can be rebuilt from the JSON
+  scripts in `tools/solidcraft-media/scripts/` with `solidcraft-cli run`.

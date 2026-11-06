@@ -1,0 +1,5 @@
+{"commands": [
+  {"command": "solid.chamfer", "params": {"edges": [[32.3, 0, 53], [-32.3, 0, 53], [0, 22.3, 53], [0, -22.3, 53]], "distance": "wall / 2", "name": "Lid chamfer"}},
+  {"command": "solid.fillet", "params": {"edges": [[30, 20, 15], [-30, 20, 15], [30, -20, 15], [-30, -20, 15]], "radius": "wall * 2", "name": "Box corners"}},
+  {"command": "parameters.list", "params": {}}
+]}

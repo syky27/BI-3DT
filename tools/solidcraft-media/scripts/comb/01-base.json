@@ -1,0 +1,14 @@
+{"commands": [
+  {"command": "parameters.add", "params": {"name": "comb_w", "expression": "80", "unit": "mm", "comment": "overall width (X)", "favorite": true}},
+  {"command": "parameters.add", "params": {"name": "comb_d", "expression": "20", "unit": "mm", "comment": "depth (Y)"}},
+  {"command": "parameters.add", "params": {"name": "comb_h", "expression": "15", "unit": "mm", "comment": "height (Z)"}},
+  {"command": "parameters.add", "params": {"name": "cable_d", "expression": "5", "unit": "mm", "comment": "cable diameter the slot takes", "favorite": true}},
+  {"command": "parameters.add", "params": {"name": "wall", "expression": "2", "unit": "mm", "comment": "tooth thickness between slots"}},
+  {"command": "parameters.add", "params": {"name": "base_t", "expression": "3", "unit": "mm", "comment": "solid floor under the slots"}},
+  {"command": "parameters.add", "params": {"name": "pitch", "expression": "cable_d + wall", "unit": "mm", "comment": "slot to slot"}},
+  {"command": "parameters.add", "params": {"name": "slot_count", "expression": "floor((comb_w - wall) / pitch)", "unit": "", "comment": "computed: as many as fit"}},
+  {"command": "sketch.create", "params": {"plane": "XY", "name": "Base outline"}},
+  {"command": "sketch.rectangle.center", "params": {"center": [0, 0], "corner": ["comb_w / 2", "comb_d / 2"]}},
+  {"command": "sketch.finish", "params": {}},
+  {"command": "solid.extrude", "params": {"distance": "comb_h", "name": "Base", "body_name": "Comb"}}
+]}
